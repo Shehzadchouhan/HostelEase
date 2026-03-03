@@ -1,0 +1,137 @@
+.services-container {
+  padding: 40px 80px;
+  background: #f4f7fc;
+  min-height: 100vh;
+}
+
+.page-title {
+  font-size: 36px;
+  color: #1f3c88;
+  margin-bottom: 30px;
+}
+
+/* Search Bar */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+/* Filter Buttons */
+.filter-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.nearby-btn,
+.filter-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.05);
+}
+
+/* Service Card */
+.services-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.service-card {
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0px 6px 20px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+}
+
+.service-left {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.service-icon {
+  font-size: 40px;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 5px 0;
+}
+
+.star {
+  color: #ccc;
+}
+
+.star.filled {
+  color: #f5b301;
+}
+
+.location {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: gray;
+}
+
+.service-right {
+  text-align: right;
+}
+
+.distance {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.details-btn {
+  background: linear-gradient(to right, #2563eb, #1e40af);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .services-container {
+    padding: 20px;
+  }
+
+  .service-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .service-right {
+    width: 100%;
+    text-align: left;
+  }
+}
