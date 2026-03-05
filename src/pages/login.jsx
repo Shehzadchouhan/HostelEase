@@ -1,14 +1,17 @@
+import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import loginImage from "../assets/login-image.png";
-import "../styles/login.css";
-import { useNavigate } from "react-router-dom";
+import loginImage from "../assets/login.png";
+import "../styles/login-module.css";
 
-
+import { motion } from "framer-motion";
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 function Login() {
   const navigate = useNavigate();
+
   return (
     <>
-      <Navbar />
+      {/* Simple Navbar (only Login + Register) */}
+      <Navbar simple={true} />
 
       <div className="login-container">
         {/* Left Side */}
@@ -20,33 +23,51 @@ function Login() {
 
         {/* Right Side */}
         <div className="right-section">
-          <div className="login-card">
+          <motion.div
+  className="login-card"
+  initial={{ opacity: 0, y: 50 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6 }}
+>
             <h2>Login to Your Account</h2>
 
-            <input type="text" placeholder="Email or Phone" />
-            <input type="password" placeholder="Password" />
+            <form className="login-form">
+              {/* Email */}
+              <label>Email or Phone</label>
+              <input type="text" placeholder="Enter your email or phone" />
 
-            <div className="forgot-password">Forgot password?</div>
+              {/* Password */}
+              <label>Password</label>
+              <input type="password" placeholder="Enter your password" />
 
-            <button
-              className="login-btn"
-              onClick={() => navigate("/dashboard")}
-            >
-              Login
-            </button>
+              <div className="forgot-password">Forgot password?</div>
 
-            <p className="register-text">
-              New user? <span>Register</span>
-            </p>
+              <button
+                type="button"
+                className="login-btn"
+                onClick={() => navigate("/")}
+              >
+                Login
+              </button>
 
-            <div className="divider">OR</div>
+              <div className="divider">OR</div>
 
-            <button className="google-btn">Continue with Google</button>
-          </div>
+              {/* Google Button */}
+              <button type="button" className="google-btn">
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png"
+                  alt="Google logo"
+                  className="google-icon"
+                />
+                Continue with Google
+              </button>
+            </form>
+          </motion.div>
         </div>
       </div>
     </>
   );
 }
+
 
 export default Login;

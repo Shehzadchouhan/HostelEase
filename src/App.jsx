@@ -1,19 +1,20 @@
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/login";
-import Dashboard from "./pages/Dashboard";
+import Landing from "./pages/landing";
 import MapView from "./pages/MapView";
 import Services from "./pages/Services"
 import Contact from "./pages/contact"
+import Register from "./pages/register";
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/" element={<Landing />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/map" element={<MapView />} />
       <Route path="/services" element={<Services />} />
-      <Route path="/contact" element={<contact />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/register" element={<Register />} />
     </Routes>
   );
 }
