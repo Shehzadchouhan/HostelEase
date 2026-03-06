@@ -1,14 +1,30 @@
+import { useState } from "react"
 import Navbar from "../components/Navbar"
 import "../styles/contact.css"
 import { FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from "react-icons/fa"
 
 function Contact() {
+
+  const [submitted, setSubmitted] = useState(false)
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setSubmitted(true)
+
+    setTimeout(() => {
+      setSubmitted(false)
+    }, 4000)
+  }
+
   return (
     <>
       <Navbar />
 
       <div className="contact-container">
-        <h1 className="contact-title">Contact Us</h1>
+        <div className="contact-header">
+          <h1>Contact Us</h1>
+          <p>Have questions? We're here to help Hostel students anytime.</p>
+        </div>
 
         <div className="contact-wrapper">
 
@@ -41,11 +57,31 @@ function Contact() {
 
           {/* Right Form Section */}
           <div className="contact-form">
-            <form>
-              <input type="text" placeholder="Your Name" required />
-              <input type="email" placeholder="Your Email" required />
-              <textarea placeholder="Your Message" rows="5" required></textarea>
+            <form onSubmit={handleSubmit}>
+
+              <div className="input-group">
+                <label>Your Name</label>
+                <input type="text" required />
+              </div>
+
+              <div className="input-group">
+                <label>Your Email</label>
+                <input type="email" required />
+              </div>
+
+              <div className="input-group">
+                <label>Your Message</label>
+                <textarea rows="5" required></textarea>
+              </div>
+
               <button type="submit">Send Message</button>
+
+              {submitted && (
+                <p className="success-msg">
+                  ✅ Message sent successfully!
+                </p>
+              )}
+
             </form>
           </div>
 

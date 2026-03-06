@@ -10,14 +10,16 @@ function MapView() {
       distance: "0.4 km",
       location: "Sandru",
       reviews: 120,
-      rating: 4
+      rating: 4,
+      category: "Laundry"
     },
     {
       name: "PressPlus Laundry",
       distance: "0.6 km",
       location: "Landru",
       reviews: 98,
-      rating: 3
+      rating: 3,
+      category: "Dry Clean"
     }
   ]
 
@@ -39,12 +41,13 @@ function MapView() {
       {/* Search Bar */}
       <div className="map-search">
         <FaSearch className="search-icon" />
-        <input type="text" placeholder="Search services..." />
+        <input type="text" placeholder="Search nearby services..." />
       </div>
 
       {/* Map Background */}
       <div className="map-container">
         <img src={mapImage} alt="Map" />
+        <div className="map-overlay"></div>
       </div>
 
       {/* Service Cards Overlay */}
@@ -54,10 +57,11 @@ function MapView() {
             <div className="card-left">
               <div className="service-icon">🧺</div>
               <div>
+                <span className="category-badge">{service.category}</span>
                 <h3>{service.name}</h3>
                 <div className="rating">
                   {renderStars(service.rating)}
-                  <span>({service.reviews} reviews)</span>
+                  <span>({service.reviews})</span>
                 </div>
                 <div className="location">
                   <FaMapMarkerAlt />
@@ -67,8 +71,8 @@ function MapView() {
             </div>
 
             <div className="card-right">
-              <p>{service.distance}</p>
-              <button>View Details</button>
+              <p className="distance">{service.distance}</p>
+              <button>View</button>
             </div>
           </div>
         ))}

@@ -159,8 +159,8 @@ function Landing() {
     <div className="footer-column">
       <h4>Our Team</h4>
       <p>Mohd Shehzad</p>
-      <p>Neha Mehta</p>
       <p>Khuspreet Kaur</p>
+      <p>Neha Mehta</p>
       <br />
       <h4>Contact</h4>
       <p>Email: hostelease.team@gmail.com</p>
