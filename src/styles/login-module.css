@@ -1,0 +1,258 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;   /* 🔥 prevents horizontal black space */
+}
+body {
+  overflow-x: hidden;
+}
+
+/* Animation */
+@keyframes slideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 37px;
+    background: #EEF3FD;
+    border: 1px solid #c9c8c8;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #2563eb;
+}
+
+.nav-links {
+  display: flex;
+  gap: 30px;
+}
+
+.left-section,
+.right-section {
+  flex: 1;
+}
+.left-section {
+    flex: 1;
+    background: linear-gradient(135deg, #8ea8ff, #e1e7ff);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 60px;
+    animation: fadeIn 1s ease;
+}
+
+/* Layout */
+.login-container {
+  display: flex;
+  min-height: calc(100vh - 80px); /* subtract navbar height */
+}
+/* Left */
+
+.left-section img {
+  border-radius: 30px;
+  opacity: 90%;
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 31px;
+  border-radius: 12px;
+
+  border: 4px solid rgba(255, 255, 255, 0.4); /* transparent white */
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+.left-section img {
+  animation: float 4s ease-in-out infinite;
+}
+
+.left-section h1 {
+  color: #1e3a8a;
+  margin-bottom: 8px;
+}
+
+.left-section p {
+  margin-top: 0;
+ font-size: 17px;
+  color: #111112;
+}
+
+/* Right */
+.right-section h2{
+  color: black;
+}
+
+.login-card {
+  width: 350px;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 10px 45px rgba(0, 0, 0, 0.1);
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  animation: slideFadeIn 0.8s ease forwards;
+}
+
+
+.forgot-password {
+  text-align: right;
+  font-size: 14px;
+  color: #2563eb;
+  cursor: pointer;
+}
+.forgot-password:hover{
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.divider {
+  text-align: center;
+  margin: 15px 0;
+  color: #94a3b8;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-form label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  cursor: pointer;
+  font-weight: 500;
+  color: #111112;
+}
+
+.google-btn:hover {
+  background: #f1f5f9;
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
+}
+
+
+.login-card input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+
+  transition: all 0.3s ease;
+}
+
+.login-card input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.login-btn {
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+}
+.login-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+}
+
+.register-text span {
+  color: #2563eb;
+  cursor: pointer;
+}
+/* RIGHT SECTION */
+.right-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f1f2f6, #a1b3fc);
+}
+
+@media (max-width: 768px) {
+
+  /* Navbar */
+  .navbar {
+    padding: 0px 20px;
+  }
+
+  /* Stack Layout */
+  .login-container {
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* Hide Left Illustration */
+  .left-section {
+    display: none;
+  }
+
+  /* Center Right Section */
+  .right-section {
+    flex: none;
+    width: 100%;
+    padding: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Login Card Full Width */
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 25px;
+  }
+
+  /* Inputs Full Width */
+  .login-card input {
+    width: 100%;
+  }
+
+  /* Google Button Responsive */
+  .google-btn {
+    width: 100%;
+  }
+
+}

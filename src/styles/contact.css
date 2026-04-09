@@ -1,0 +1,127 @@
+.contact-container {
+  padding: 80px 10%;
+  min-height: 100vh;
+  background: linear-gradient(to right, #eef2ff, #f8fafc);
+}
+
+.contact-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.contact-header h1 {
+  font-size: 38px;
+  color: #1e3a8a;
+  margin-bottom: 10px;
+}
+
+.contact-header p {
+  color: #64748b;
+  font-size: 16px;
+}
+
+/* Layout */
+.contact-wrapper {
+  display: flex;
+  gap: 60px;
+  justify-content: space-between;
+}
+
+/* Info Section */
+.contact-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.info-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: white;
+  padding: 25px;
+  border-radius: 18px;
+  box-shadow: 0px 8px 30px rgba(0,0,0,0.06);
+  transition: 0.3s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+}
+
+.info-icon {
+  font-size: 26px;
+  color: #2563eb;
+}
+
+/* Form Section */
+.contact-form {
+  flex: 1;
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0px 8px 30px rgba(0,0,0,0.06);
+}
+
+.contact-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #334155;
+}
+
+.contact-form input,
+.contact-form textarea {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  outline: none;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0px 0px 0px 3px rgba(37,99,235,0.1);
+}
+
+.contact-form button {
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(to right, #2563eb, #1e40af);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.contact-form button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 20px rgba(37,99,235,0.4);
+}
+
+.success-msg {
+  color: green;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contact-wrapper {
+    flex-direction: column;
+  }
+}
