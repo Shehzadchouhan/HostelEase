@@ -25,9 +25,11 @@ app.use((req, res, next) => {
 
 const shopRoutes = require("./routes/shopRoutes");
 const authRoutes = require("./routes/authRoutes");
+const contactRoutes = require("./routes/contactRoutes");
 
 app.use("/api/shops", shopRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/contact", contactRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server is running 🚀");

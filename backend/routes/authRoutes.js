@@ -17,10 +17,10 @@ router.use((req, res, next) => {
 router.post('/register', async (req, res) => {
   try {
     console.log('Registration request received:', req.body);
-    const { fullName, email, phone, hostelName, roomNumber, password } = req.body;
+    const { fullName, email, phone, collegeName, cityName, stateName, password } = req.body;
 
     // Validation
-    if (!fullName || !email || !phone || !hostelName || !roomNumber || !password) {
+    if (!fullName || !email || !phone || !collegeName || !cityName || !stateName || !password) {
       return res.status(400).json({
         success: false,
         message: 'All fields are required'
@@ -44,8 +44,9 @@ router.post('/register', async (req, res) => {
       fullName,
       email: email.toLowerCase(),
       phone,
-      hostelName,
-      roomNumber,
+      collegeName,
+      cityName,
+      stateName,
       password
     });
 
@@ -66,8 +67,9 @@ router.post('/register', async (req, res) => {
       fullName: user.fullName,
       email: user.email,
       phone: user.phone,
-      hostelName: user.hostelName,
-      roomNumber: user.roomNumber,
+      collegeName: user.collegeName,
+      cityName: user.cityName,
+      stateName: user.stateName,
       role: user.role,
       createdAt: user.createdAt
     };

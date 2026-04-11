@@ -23,10 +23,42 @@ const shopSchema = new mongoose.Schema({
   contact: {
     type: String
   },
+  address: {
+    type: String,
+    default: ""
+  },
   rating: {
     type: Number,
     default: 0
-  }
+  },
+  image: {
+    type: String,
+    default: null
+  },
+  description: {
+    type: String,
+    default: ""
+  },
+  pricing: [{
+    title: String,
+    price: String
+  }],
+  minimumOrder: {
+    type: String,
+    default: "₹0"
+  },
+  paymentMethods: [{
+    type: String
+  }],
+  highlights: [{
+    type: String
+  }],
+  reviews: [{
+    name: String,
+    rating: Number,
+    comment: String,
+    date: String
+  }]
 }, { timestamps: true });
 
 // 👇 IMPORTANT for location search

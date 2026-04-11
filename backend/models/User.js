@@ -18,12 +18,17 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  hostelName: {
+  collegeName: {
     type: String,
     required: true,
     trim: true
   },
-  roomNumber: {
+  cityName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  stateName: {
     type: String,
     required: true,
     trim: true
