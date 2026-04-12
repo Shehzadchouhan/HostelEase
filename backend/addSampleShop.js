@@ -146,18 +146,18 @@ async function addSampleShop() {
       const existingShop = await Shop.findOne({ name: shopData.name });
       
       if (existingShop) {
-        console.log(`✅ Shop already exists: ${shopData.name}`);
+        console.log(`Shop already exists: ${shopData.name}`);
       } else {
         const newShop = new Shop(shopData);
         await newShop.save();
-        console.log(`✅ Added shop: ${shopData.name} (ID: ${newShop._id})`);
+        console.log(`Added shop: ${shopData.name} (ID: ${newShop._id})`);
       }
     }
 
-    console.log("\n📍 All sample shops processed successfully!");
+    console.log("\nAll sample shops processed successfully");
 
   } catch (error) {
-    console.error("❌ Error:", error);
+    console.error("Error:", error);
   } finally {
     await mongoose.connection.close();
   }

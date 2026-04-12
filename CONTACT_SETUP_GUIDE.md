@@ -1,6 +1,6 @@
 # Contact Page Setup Guide
 
-## 🎯 What's New
+## What's New
 
 Your contact page now has a fully functional support ticket system where:
 - Users can submit contact/support messages
@@ -12,16 +12,16 @@ Your contact page now has a fully functional support ticket system where:
 
 ---
 
-## ⚙️ Setup Steps
+## Setup Steps
 
-### 1️⃣ Install Required Package
+### 1. Install Required Package
 
 ```bash
 cd backend
 npm install nodemailer
 ```
 
-### 2️⃣ Generate Gmail App Password
+### 2. Generate Gmail App Password
 
 Since Gmail doesn't allow regular passwords for third-party apps:
 
@@ -30,7 +30,7 @@ Since Gmail doesn't allow regular passwords for third-party apps:
 3. Google will generate a 16-character password
 4. Copy this password (you'll need it in step 3)
 
-### 3️⃣ Setup Environment Variables
+### 3. Setup Environment Variables
 
 Create/Update your `.env` file in the backend folder:
 
@@ -47,7 +47,7 @@ SUPPORT_EMAIL=supporthostelease@gmail.com
 
 **Important**: Replace `your_16_char_password_here` with the actual Gmail app password you generated!
 
-### 4️⃣ Restart Backend Server
+### 4. Restart Backend Server
 
 ```bash
 cd backend
@@ -58,24 +58,24 @@ node server.js
 
 ---
 
-## 🚀 Features
+## Features
 
 ### For Users:
-- ✅ Submit contact queries with name, email, phone, subject, message
-- ✅ Receive confirmation email immediately
-- ✅ Get unique Ticket ID to track their request
-- ✅ Copy ticket ID easily with one click
+- Submit contact queries with name, email, phone, subject, message
+- Receive confirmation email immediately
+- Get unique Ticket ID to track their request
+- Copy ticket ID easily with one click
 
 ### For Support Team:
-- 📧 Receive ALL contact submissions on: `supporthostelease@gmail.com`
-- 📋 View all tickets: `GET /api/contact/all`
-- 🔍 Track specific ticket: `GET /api/contact/ticket/:ticketId`
-- 💬 Add response to ticket: `PUT /api/contact/respond/:ticketId`
-- 🗑️ Delete ticket: `DELETE /api/contact/:ticketId`
+- Receive ALL contact submissions on: `supporthostelease@gmail.com`
+- View all tickets: `GET /api/contact/all`
+- Track specific ticket: `GET /api/contact/ticket/:ticketId`
+- Add response to ticket: `PUT /api/contact/respond/:ticketId`
+- Delete ticket: `DELETE /api/contact/:ticketId`
 
 ---
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### Submit Contact Form
 ```
@@ -129,7 +129,7 @@ DELETE /api/contact/:ticketId
 
 ---
 
-## 📧 Email Templates
+## Email Templates
 
 ### Confirmation Email to User
 - Shows: Ticket ID, response time expectations
@@ -144,7 +144,7 @@ DELETE /api/contact/:ticketId
 
 ---
 
-## 📝 Contact Information Updated
+## Contact Information
 
 **Location**: Gill HostelEaze, Gill Road, Ludhiana, Punjab
 
@@ -156,7 +156,7 @@ DELETE /api/contact/:ticketId
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Emails not sending?
 1. Check if EMAIL_USER and EMAIL_PASSWORD are correct in .env
@@ -176,7 +176,7 @@ DELETE /api/contact/:ticketId
 
 ---
 
-## 📦 Files Created/Updated
+## Files Created/Updated
 
 **Backend:**
 - `models/Contact.js` - Contact message schema
@@ -192,7 +192,7 @@ DELETE /api/contact/:ticketId
 
 ---
 
-## ✅ Testing the System
+## Testing the System
 
 ### 1. Frontend Test
 - Go to: http://localhost:5173/contact
@@ -226,7 +226,7 @@ POST http://localhost:5000/api/contact/submit
 
 ---
 
-## 💡 Tips
+## Tips
 
 1. **Ticket ID Format**: `TICKET-{timestamp}-{count}`
    - Example: `TICKET-1712957234-1`
@@ -242,13 +242,13 @@ POST http://localhost:5000/api/contact/submit
 
 ---
 
-## 🎉 You're All Set!
+## You're All Set!
 
 Your contact form is now fully functional with:
-- ✅ Real email notifications
-- ✅ Ticket tracking system
-- ✅ Database storage
-- ✅ Admin response management
-- ✅ Professional UI/UX
+- Real email notifications
+- Ticket tracking system
+- Database storage
+- Admin response management
+- Professional UI/UX
 
 **Questions?** Check the console logs or error messages for debugging!

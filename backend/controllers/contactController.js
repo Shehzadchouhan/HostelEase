@@ -26,23 +26,23 @@ const submitContact = async (req, res) => {
 
     // Save to database
     await newContact.save();
-    console.log("✅ Contact saved to database:", newContact.ticketId);
+    console.log("Contact saved to database:", newContact.ticketId);
 
     // Send emails
     try {
-      console.log("📧 Attempting to send support email...");
+      console.log("Attempting to send support email..."); 
       await sendSupportEmail(newContact);
-      console.log("✅ Support email sent successfully");
+      console.log("Support email sent successfully");
     } catch (emailError) {
-      console.error("❌ Error sending support email:", emailError.message);
+      console.error("Error sending support email:", emailError.message);
     }
 
     try {
-      console.log("📧 Attempting to send confirmation email...");
+      console.log("Attempting to send confirmation email...");
       await sendConfirmationEmail(newContact);
-      console.log("✅ Confirmation email sent successfully");
+      console.log("Confirmation email sent successfully");
     } catch (emailError) {
-      console.error("❌ Error sending confirmation email:", emailError.message);
+      console.error("Error sending confirmation email:", emailError.message);
     }
 
     res.status(200).json({

@@ -1,8 +1,8 @@
 const nodemailer = require("nodemailer");
 
-console.log("📧 Email Configuration:");
+console.log("Email Configuration:");
 console.log("  USER:", process.env.EMAIL_USER);
-console.log("  PASSWORD:", process.env.EMAIL_PASSWORD ? "✅ Set" : "❌ Missing");
+console.log("  PASSWORD:", process.env.EMAIL_PASSWORD ? "Set" : "Missing");
 console.log("  SUPPORT_EMAIL:", process.env.SUPPORT_EMAIL);
 
 // Configure email transporter
@@ -17,9 +17,9 @@ const transporter = nodemailer.createTransport({
 // Verify transporter connection
 transporter.verify((error, success) => {
   if (error) {
-    console.error("❌ Email transporter error:", error.message);
+    console.error("Email transporter error:", error.message);
   } else {
-    console.log("✅ Email transporter ready to send messages");
+    console.log("Email transporter ready to send messages");
   }
 });
 
@@ -47,7 +47,7 @@ const sendSupportEmail = async (contactData) => {
     <body>
       <div class="container">
         <div class="header">
-          <h2>📧 New Support Message from HostelEase</h2>
+          <h2>New Support Message from HostelEase</h2>
         </div>
         
         <div class="ticket-id">Ticket ID: ${ticketId}</div>
@@ -76,7 +76,7 @@ const sendSupportEmail = async (contactData) => {
         </div>
         
         <div class="footer">
-          <p>⚠️ Please reply to this ticket with Ticket ID: ${ticketId}</p>
+          <p>Please reply to this ticket with Ticket ID: ${ticketId}</p>
           <p>© 2026 HostelEase. All Rights Reserved.</p>
         </div>
       </div>
@@ -85,7 +85,7 @@ const sendSupportEmail = async (contactData) => {
   `;
 
   try {
-    console.log("🔄 Sending support email to:", process.env.SUPPORT_EMAIL);
+    console.log("Sending support email to:", process.env.SUPPORT_EMAIL);
     const info = await transporter.sendMail({
       from: process.env.EMAIL_USER || "supporthostelease@gmail.com",
       to: process.env.SUPPORT_EMAIL || "supporthostelease@gmail.com",
@@ -93,9 +93,9 @@ const sendSupportEmail = async (contactData) => {
       html: htmlContent,
       replyTo: email,
     });
-    console.log("✅ Support email sent successfully - MessageID:", info.messageId);
+    console.log("Support email sent successfully - MessageID:", info.messageId);
   } catch (error) {
-    console.error("❌ Error sending support email:", error.message);
+    console.error("Error sending support email:", error.message);
     // Don't throw - let contact be saved even if email fails
   }
 };

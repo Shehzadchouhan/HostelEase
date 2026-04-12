@@ -32,7 +32,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/contact", contactRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Server is running 🚀");
+  res.send("Server is running");
 });
 
 mongoose.connect(MONGO_URI)
