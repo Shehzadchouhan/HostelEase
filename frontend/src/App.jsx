@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom"
 
-import Landing from "./pages/Landing"
+import Landing from "./pages/landing"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
 import MapView from "./pages/MapView"
