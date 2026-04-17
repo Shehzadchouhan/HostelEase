@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom"
 
 import Landing from "./pages/landing"
-import Login from "./pages/Login"
+import Login from "./pages/login"
 import Register from "./pages/Register"
 import MapView from "./pages/MapView"
 import Services from "./pages/Services"
