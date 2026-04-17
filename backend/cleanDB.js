@@ -1,6 +1,8 @@
-require("dotenv").config();
-const mongoose = require("mongoose");
-const Shop = require("./models/shop");
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import Shop from "./models/shop.js";
+
+dotenv.config();
 
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/hostelease";
 

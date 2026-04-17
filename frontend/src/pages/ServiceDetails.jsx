@@ -1,268 +1,297 @@
 import { useParams } from "react-router-dom";
-import { FaStar, FaMapMarkerAlt, FaFire } from "react-icons/fa";
+import {
+  FaStar, FaMapMarkerAlt, FaFire, FaComment,
+  FaChevronLeft, FaChevronRight, FaMapPin,
+  FaCreditCard, FaMoneyBillWave, FaGlobe,
+} from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import "../styles/serviceDetails.css";
-import { useState } from "react";
-import laundry1 from "../assets/services/laundry1.jpg"
-import laundry2 from "../assets/services/laundry2.png"
-import laundry3 from "../assets/services/laundry3.png"
+import { useState, useEffect } from "react";
+import { getShopById } from "../api/api";
+
+// Fallback pricing if shop has none stored
+const fallbackPricing = {
+  "Barber Shop": [
+    { title: "Haircut", price: "₹100" },
+    { title: "Beard Trim", price: "₹50" },
+    { title: "Hair Styling", price: "₹150" },
+    { title: "Face Cleanup", price: "₹200" },
+  ],
+  Laundry: [
+    { title: "Shirt Washing", price: "₹20" },
+    { title: "Pant Washing", price: "₹25" },
+    { title: "Bedsheet Wash", price: "₹40" },
+    { title: "Iron Service", price: "₹10 per piece" },
+  ],
+  Food: [
+    { title: "Breakfast Meal", price: "₹80" },
+    { title: "Lunch Meal", price: "₹150" },
+    { title: "Snacks", price: "₹30–50" },
+    { title: "Beverages", price: "₹20–40" },
+  ],
+};
+
+const fallbackPayments = {
+  "Barber Shop": ["Cash (Offline)", "UPI / Online Payment", "Card Payment"],
+  Laundry: ["Cash (Offline)", "UPI / Online Payment"],
+  Medical: ["Cash (Offline)", "Card Payment"],
+  Food: ["Cash (Offline)", "UPI / Online Payment", "Card Payment"],
+};
+
+const dummyReviews = [
+  { name: "Rajesh Kumar", rating: 5, comment: "Excellent service! Very professional.", date: "2 days ago" },
+  { name: "Priya Singh", rating: 4, comment: "Great experience. Staff is friendly.", date: "1 week ago" },
+  { name: "Amit Patel", rating: 5, comment: "Outstanding quality. Highly recommended!", date: "10 days ago" },
+];
+
+const galleryImages = [
+  "https://via.placeholder.com/800x500?text=Shop+Image+1",
+  "https://via.placeholder.com/800x500?text=Shop+Image+2",
+  "https://via.placeholder.com/800x500?text=Shop+Image+3",
+  "https://via.placeholder.com/800x500?text=Shop+Image+4",
+];
 
 function ServiceDetails() {
   const { id } = useParams();
-  const [activeImage, setActiveImage] = useState(0);
-  // Temporary static data (later we will connect backend)
-  const services = [
-    {
-      id: 1,
-      name: "Clean & Dry Laundry",
-      category: "Laundry",
-      distance: "0.4 km",
-      location: "Sandra",
-      reviews: 120,
-      rating: 4.2,
-      top: true,
-      images: [laundry1, laundry2, laundry3],
-      pricing: [
-        { title: "Wash & Fold", price: "₹50/kg" },
-        { title: "Dry Cleaning", price: "₹80/item" },
-        { title: "Ironing", price: "₹10/item" },
-      ],
-      minimumOrder: "₹100",
+  const [service, setService] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-      phone: "9876543210",
-      address: "Shop 12, Main Road, Near Sandra Hostel",
-      mapLink: "https://www.google.com/maps",
-      whatsapp: "9876543210",
-      paymentMethods: ["UPI", "Cash"],
+  useEffect(() => {
+    const fetchService = async () => {
+      try {
+        setLoading(true);
+        const response = await getShopById(id);
+        const shop = response.data.data;
 
+        setService({
+          id: shop._id,
+          name: shop.name,
+          category: shop.category,
+          coordinates: shop.location?.coordinates,
+          location: shop.location?.coordinates
+            ? `${shop.location.coordinates[1]}, ${shop.location.coordinates[0]}`
+            : "Unknown Location",
+          // ✅ Real data first, fallback only if empty
+          rating: shop.rating || 4.5,
+          top: (shop.rating || 4.5) >= 4,
+          image: shop.image || null,
+          images: galleryImages,
+          pricing:
+            shop.pricing?.length > 0
+              ? shop.pricing
+              : fallbackPricing[shop.category] || [{ title: "Basic Service", price: "₹100" }],
+          minimumOrder: shop.minimumOrder || "₹0",
+          phone: shop.contact || "Not available",
+          address: shop.address || "Address not available",
+          description:
+            shop.description ||
+            `${shop.name} is a trusted ${shop.category.toLowerCase()} service provider in your area.`,
+          paymentMethods:
+            shop.paymentMethods?.length > 0
+              ? shop.paymentMethods
+              : fallbackPayments[shop.category] || ["Cash (Offline)", "UPI / Online Payment"],
+          highlights:
+            shop.highlights?.length > 0
+              ? shop.highlights
+              : ["Quality Service", "Professional Staff", "Hygienic Environment", "Fast Service"],
+          reviewsList:
+            shop.reviews?.length > 0 ? shop.reviews : dummyReviews,
+          reviews: shop.reviews?.length > 0 ? shop.reviews.length : dummyReviews.length,
+        });
+        setCurrentImageIndex(0);
+      } catch (err) {
+        console.error("Error fetching service:", err);
+        setError("Service not found or failed to load.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (id) fetchService();
+  }, [id]);
 
-      description: `
-Clean & Dry Laundry offers affordable and fast laundry services 
-near the Sandra hostel area. We provide same-day delivery, 
-free pickup for hostel students, and professional fabric care.
+  const handlePrevImage = () =>
+    setCurrentImageIndex((prev) => (prev === 0 ? service.images.length - 1 : prev - 1));
+  const handleNextImage = () =>
+    setCurrentImageIndex((prev) => (prev === service.images.length - 1 ? 0 : prev + 1));
 
-With over 3 years of experience, we have served 500+ students 
-in the area. Our services are reliable, hygienic, and student-budget friendly.
-`,
-highlights: [
-  "Free Pickup",
-  "Same-Day Delivery",
-  "Student Discount Available",
-  "500+ Students Served",
-],
+  if (loading)
+    return (
+      <>
+        <Navbar />
+        <div style={{ padding: "60px", textAlign: "center", color: "#666" }}>
+          <h2>⏳ Loading service details...</h2>
+        </div>
+      </>
+    );
 
+  if (error || !service)
+    return (
+      <>
+        <Navbar />
+        <div style={{ padding: "60px", textAlign: "center", color: "#d32f2f" }}>
+          <h2>❌ {error || "Service not found"}</h2>
+        </div>
+      </>
+    );
 
-reviewsList: [
-  {
-    name: "Riya S.",
-    rating: 5,
-    comment: "Very fast service and affordable for students!",
-    date: "12 Feb 2026",
-  },
-  {
-    name: "Aman K.",
-    rating: 4,
-    comment: "Pickup from hostel was super convenient.",
-    date: "8 Feb 2026",
-  },
-  {
-    name: "Neha P.",
-    rating: 5,
-    comment: "Clothes came back fresh and neatly packed.",
-    date: "2 Feb 2026",
-  },
-],
+  // Generate proper map links
+  const getMapLink = () => {
+    if (!service.coordinates || service.coordinates.length < 2) {
+      // Fallback location (Delhi)
+      return "https://www.openstreetmap.org/?mlat=28.7041&mlon=77.1025&zoom=15";
+    }
+    const [lng, lat] = service.coordinates;
+    return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=16&marker=${lat},${lng}`;
+  };
 
-    },
-    {
-      id: 2,
-      name: "PressPlus Laundry",
-      category: "Laundry",
-      distance: "0.6 km",
-      location: "Landra",
-      reviews: 98,
-      rating: 3.8,
-      top: false,
-    },
-  ];
-
-  const service = services.find((item) => item.id === Number(id));
-
-  if (!service) {
-    return <h2 style={{ padding: "40px" }}>Service not found</h2>;
-  }
+  const openStreetMapLink = getMapLink();
+  const googleMapsLink = service.coordinates && service.coordinates.length === 2
+    ? `https://www.google.com/maps/?q=${service.coordinates[1]},${service.coordinates[0]}`
+    : "https://www.google.com/maps";
 
   return (
     <>
       <Navbar />
-
       <div className="service-details-container">
-        {/* HERO SECTION */}
-        <div className="service-hero">
-          <div className="hero-left">
-            <h1 className="service-title">{service.name}</h1>
-
-            <div className="service-rating">
-              <FaStar className="star-icon" />
-              <span>
-                {service.rating} ({service.reviews} reviews)
-              </span>
-            </div>
-
-            <div className="service-location">
-              <FaMapMarkerAlt />
-              <span>
-                {service.location} | {service.distance} away
-              </span>
-            </div>
-
-            <div className="service-category">{service.category} Service</div>
-
-            {service.top && (
-              <div className="top-badge">
-                <FaFire /> Top Rated
-              </div>
-            )}
-          </div>
-        </div>
-        {/* IMAGE GALLERY */}
+        {/* IMAGE CAROUSEL */}
         <div className="image-gallery">
-          <div className="main-image">
-            <img src={service.images[activeImage]} alt="service" />
-          </div>
-
-          <div className="thumbnail-row">
-            {service.images.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt="thumbnail"
-                className={
-                  activeImage === index ? "thumbnail active" : "thumbnail"
-                }
-                onClick={() => setActiveImage(index)}
-              />
-            ))}
+          <div className="carousel-container">
+            <img
+              src={service.images[currentImageIndex]}
+              alt={`${service.name} - ${currentImageIndex + 1}`}
+              className="carousel-image"
+            />
+            <button className="carousel-btn prev-btn" onClick={handlePrevImage}><FaChevronLeft /></button>
+            <button className="carousel-btn next-btn" onClick={handleNextImage}><FaChevronRight /></button>
+            <div className="carousel-dots">
+              {service.images.map((_, index) => (
+                <div
+                  key={index}
+                  className={`dot ${index === currentImageIndex ? "active" : ""}`}
+                  onClick={() => setCurrentImageIndex(index)}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* PRICING SECTION */}
-        <div className="pricing-section">
-          <h2 className="section-title">Pricing</h2>
-
-          <div className="pricing-card">
-            {service.pricing.map((item, index) => (
-              <div key={index} className="pricing-row">
-                <span className="pricing-title">{item.title}</span>
-                <span className="pricing-price">{item.price}</span>
+        {/* HERO */}
+        <div className="service-hero">
+          <div className="hero-content">
+            <h1 className="service-title">{service.name}</h1>
+            <div className="service-meta">
+              <div className="service-rating">
+                <FaStar className="star-icon" />
+                <span className="rating-value">{service.rating.toFixed(1)}/5</span>
+                <span className="reviews-count">({service.reviews} reviews)</span>
               </div>
-            ))}
-
-            <div className="minimum-order">
-              Minimum Order: {service.minimumOrder}
+              <div className="service-category-badge">{service.category}</div>
+              {service.top && <div className="top-badge"><FaFire /> Top Rated</div>}
             </div>
           </div>
         </div>
 
-        {/* CONTACT SECTION */}
+        {/* PRICING */}
+        {service.pricing?.length > 0 && (
+          <div className="services-section">
+            <h2 className="section-title">💰 Services & Pricing</h2>
+            <div className="services-grid">
+              {service.pricing.map((item, index) => (
+                <div key={index} className="service-card">
+                  <div className="service-card-content">
+                    <h3 className="service-name">{item.title}</h3>
+                    <div className="service-price">{item.price}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* PAYMENT METHODS */}
+        <div className="payment-methods-section">
+          <h2 className="section-title">💳 Payment Methods</h2>
+          <div className="payment-badges">
+            {service.paymentMethods.map((method, index) => {
+              let icon = <FaMoneyBillWave />;
+              if (method.includes("UPI") || method.includes("Online")) icon = <FaGlobe />;
+              else if (method.includes("Card")) icon = <FaCreditCard />;
+              return (
+                <div key={index} className="payment-badge">
+                  {icon} <span>{method}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* CONTACT */}
         <div className="contact-section">
-          <h2 className="section-title">Contact & Booking</h2>
-
+          <h2 className="section-title">📍 Contact & Location</h2>
           <div className="contact-card">
-            <p className="service-address">📍 {service.address}</p>
-
-            <div className="action-buttons">
-              <a href={`tel:${service.phone}`} className="btn call-btn">
-                📞 Call Now
-              </a>
-
-              <a
-                href={`https://wa.me/${service.whatsapp}`}
-                target="_blank"
-                rel="noreferrer"
-                className="btn whatsapp-btn"
-              >
-                💬 WhatsApp
-              </a>
-
-              <a
-                href={service.mapLink}
-                target="_blank"
-                rel="noreferrer"
-                className="btn map-btn"
-              >
-                🗺 View on Map
-              </a>
+            <div className="contact-item">
+              <span className="label">📍 Address:</span>
+              <span className="value">{service.address}</span>
             </div>
-
-            <div className="payment-methods">
-              <strong>Payment Methods:</strong>{" "}
-              {service.paymentMethods.join(", ")}
+            <div className="contact-item">
+              <span className="label">📱 Phone:</span>
+              <a href={`tel:${service.phone}`} className="contact-link">{service.phone}</a>
+            </div>
+          </div>
+          <div className="map-cta">
+            <div className="map-buttons-container">
+              <a href={googleMapsLink} target="_blank" rel="noreferrer" className="btn map-btn-google">
+                <FaMapPin /> Google Maps
+              </a>
+              <a href={openStreetMapLink} target="_blank" rel="noreferrer" className="btn map-btn-osm">
+                <FaMapPin /> OpenStreetMap
+              </a>
             </div>
           </div>
         </div>
 
-        {/* DESCRIPTION SECTION */}
-<div className="description-section">
-
-  <h2 className="section-title">About This Service</h2>
-
-  <div className="description-card">
-
-    <p className="service-description">
-      {service.description}
-    </p>
-
-    <div className="highlights">
-      {service.highlights.map((item, index) => (
-        <div key={index} className="highlight-item">
-          ✔ {item}
-        </div>
-      ))}
-    </div>
-
-  </div>
-
-</div>
-
-{/* STUDENT REVIEWS SECTION */}
-<div className="reviews-section">
-
-  <h2 className="section-title">
-    Student Reviews ({service.reviewsList.length})
-  </h2>
-
-  <div className="reviews-container">
-
-    {service.reviewsList.map((review, index) => (
-      <div key={index} className="review-card">
-
-        <div className="review-header">
-          <div className="review-name">
-            {review.name}
+        {/* ABOUT */}
+        {service.description && (
+          <div className="description-section">
+            <h2 className="section-title">ℹ️ About This Service</h2>
+            <div className="description-card">
+              <p className="service-description">{service.description}</p>
+              {service.highlights?.length > 0 && (
+                <div className="highlights">
+                  <h3>✨ Why Choose Us?</h3>
+                  <div className="highlights-list">
+                    {service.highlights.map((item, index) => (
+                      <div key={index} className="highlight-item">
+                        <span className="checkmark">✓</span> {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
+        )}
 
-          <div className="review-rating">
-            {"⭐".repeat(review.rating)}
+        {/* REVIEWS */}
+        {service.reviewsList?.length > 0 && (
+          <div className="reviews-section">
+            <h2 className="section-title">⭐ Customer Reviews ({service.reviewsList.length})</h2>
+            <div className="reviews-container">
+              {service.reviewsList.map((review, index) => (
+                <div key={index} className="review-card">
+                  <div className="review-header">
+                    <div className="review-name">{review.name}</div>
+                    <div className="review-rating">{Array(review.rating).fill("⭐").join("")}</div>
+                  </div>
+                  <p className="review-comment"><FaComment /> "{review.comment}"</p>
+                  <div className="review-date">📅 {review.date}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-
-        <p className="review-comment">
-          "{review.comment}"
-        </p>
-
-        <div className="review-date">
-          {review.date}
-        </div>
-
-      </div>
-    ))}
-
-  </div>
-
-</div>
-
-
+        )}
       </div>
     </>
   );

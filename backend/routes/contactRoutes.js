@@ -1,12 +1,13 @@
-const express = require("express");
-const router = express.Router();
-const {
+import express from "express";
+import {
   submitContact,
   getAllContacts,
   getContactByTicketId,
   respondToContact,
   deleteContact,
-} = require("../controllers/contactController");
+} from "../controllers/contactController.js";
+
+const router = express.Router();
 
 // Submit a new contact message
 router.post("/submit", submitContact);
@@ -23,4 +24,4 @@ router.put("/respond/:ticketId", respondToContact);
 // Delete contact (admin)
 router.delete("/:ticketId", deleteContact);
 
-module.exports = router;
+export default router;

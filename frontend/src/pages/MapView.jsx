@@ -1,93 +1,237 @@
-import "../styles/mapview.css"
-import { FaSearch, FaStar, FaRegStar, FaMapMarkerAlt } from "react-icons/fa"
-import mapImage from "../assets/map-bg.png"
+import Navbar from "../components/Navbar";
+import "../styles/mapview.css";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaSearch, FaMapMarkerAlt, FaPhone, FaStar, FaArrowRight, FaMapPin } from "react-icons/fa";
+import { getShops, getNearbyShops } from "../api/api";
 
 function MapView() {
+  const [userLocation, setUserLocation] = useState(null);
+  const [search, setSearch] = useState("");
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const services = [
-    {
-      name: "Clean & Dry Laundry",
-      distance: "0.4 km",
-      location: "Sandru",
-      reviews: 120,
-      rating: 4,
-      category: "Laundry"
-    },
-    {
-      name: "PressPlus Laundry",
-      distance: "0.6 km",
-      location: "Landru",
-      reviews: 98,
-      rating: 3,
-      category: "Dry Clean"
+  // 📍 Get user's current geolocation
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      console.warn("Geolocation not supported");
+      return;
     }
-  ]
+    
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const location = { 
+          lat: pos.coords.latitude, 
+          lng: pos.coords.longitude 
+        };
+        setUserLocation(location);
+      },
+      (err) => console.log("Geolocation error:", err)
+    );
+  }, []);
 
-  const renderStars = (rating) => {
-    return (
-      <>
-        {[...Array(5)].map((_, i) =>
-          i < rating
-            ? <FaStar key={i} className="star filled" />
-            : <FaRegStar key={i} className="star" />
-        )}
-      </>
-    )
-  }
+  // 🎯 Fetch nearby shops or all shops based on user location
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setLoading(true);
+        let response;
+
+        // If user location is available, fetch nearby shops (within 2km)
+        if (userLocation) {
+          response = await getNearbyShops(userLocation.lat, userLocation.lng);
+        } else {
+          // Fallback: get all shops if geolocation not available
+          response = await getShops();
+        }
+
+        const shops = response.data.data || [];
+
+        const transformedServices = shops.map((shop) => ({
+          id: shop._id,
+          name: shop.name,
+          category: shop.category,
+          location: shop.location?.coordinates
+            ? `${shop.location.coordinates[1].toFixed(4)}, ${shop.location.coordinates[0].toFixed(4)}`
+            : "Unknown",
+          lat: shop.location?.coordinates ? shop.location.coordinates[1] : 0,
+          lng: shop.location?.coordinates ? shop.location.coordinates[0] : 0,
+          coordinates: shop.location?.coordinates || null,
+          rating: shop.rating || 4.5,
+          contact: shop.contact || "+91 XXXXXXXXXX",
+          distance: "Calculating...",
+          address: shop.location?.address || "Address not available",
+        }));
+
+        setServices(transformedServices);
+      } catch (error) {
+        console.error("Error fetching services:", error);
+        setServices([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, [userLocation]);
+
+  const filteredServices = services.filter((s) =>
+    s.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // 🗺️ Generate Google Maps link for user location
+  const getUserMapLink = () => {
+    if (!userLocation) return null;
+    return `https://www.google.com/maps/?q=${userLocation.lat},${userLocation.lng}`;
+  };
+
+  // 🗺️ Generate OpenStreetMap link for user location
+  const getUserOSMLink = () => {
+    if (!userLocation) return null;
+    return `https://www.openstreetmap.org/?mlat=${userLocation.lat}&mlon=${userLocation.lng}&zoom=16`;
+  };
+
+  // 🗺️ Generate Google Maps link for shop
+  const getShopGoogleMapsLink = (shop) => {
+    if (!shop.coordinates || shop.coordinates.length < 2) {
+      return "https://www.google.com/maps";
+    }
+    const [lng, lat] = shop.coordinates;
+    return `https://www.google.com/maps/?q=${lat},${lng}`;
+  };
+
+  // 🗺️ Generate OpenStreetMap link for shop
+  const getShopOSMLink = (shop) => {
+    if (!shop.coordinates || shop.coordinates.length < 2) {
+      return "https://www.openstreetmap.org/?zoom=15";
+    }
+    const [lng, lat] = shop.coordinates;
+    return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=16&marker=${lat},${lng}`;
+  };
 
   return (
-    <div className="map-page">
+    <>
+      <Navbar />
+      <div className="mapview-container">
+        <div className="mapview-header">
+          <div className="header-content">
+            <h1>Nearby Services</h1>
+            <p>Discover services around your location</p>
+          </div>
+        </div>
 
-      {/* Search Bar */}
-      <div className="map-search">
-        <FaSearch className="search-icon" />
-        <input type="text" placeholder="Search nearby services..." />
-      </div>
+        <div className="mapview-search-section">
+          <div className="search-wrapper">
+            <FaSearch className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search services..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
 
-      {/* Map Background */}
-      <div className="map-container">
-        <img src={mapImage} alt="Map" />
-        <div className="map-overlay"></div>
-      </div>
-
-      {/* Service Cards Overlay */}
-      <div className="map-cards">
-        {services.map((service, index) => (
-          <div className="map-card" key={index}>
-            <div className="card-left">
-              <div className="service-icon">🧺</div>
-              <div>
-                <span className="category-badge">{service.category}</span>
-                <h3>{service.name}</h3>
-                <div className="rating">
-                  {renderStars(service.rating)}
-                  <span>({service.reviews})</span>
-                </div>
-                <div className="location">
-                  <FaMapMarkerAlt />
-                  <span>{service.location}</span>
-                </div>
+        {userLocation && (
+          <div className="user-location-section">
+            <div className="location-card">
+              <div className="location-icon">
+                <FaMapMarkerAlt />
+              </div>
+              <div className="location-details">
+                <h3>Your Current Location</h3>
+                <p>{userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}</p>
+              </div>
+              <div className="map-buttons-group">
+                <a 
+                  href={getUserMapLink()} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="view-map-btn"
+                >
+                  <FaMapPin /> Google Maps
+                </a>
+                <a 
+                  href={getUserOSMLink()} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="view-map-btn osm-btn"
+                >
+                  <FaMapPin /> OSM
+                </a>
               </div>
             </div>
-
-            <div className="card-right">
-              <p className="distance">{service.distance}</p>
-              <button>View</button>
-            </div>
           </div>
-        ))}
-      </div>
+        )}
 
-      {/* Bottom Navigation */}
-      <div className="bottom-nav">
-        <div>🏠<p>Home</p></div>
-        <div className="active">📍<p>Map</p></div>
-        <div>❤️<p>Saved</p></div>
-        <div>👤<p>Profile</p></div>
-      </div>
+        <div className="services-section">
+          <div className="services-header">
+            <h2>Available Services</h2>
+            <span className="service-count">{filteredServices.length} found</span>
+          </div>
 
-    </div>
-  )
+          {loading ? (
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+              <p>Loading services...</p>
+            </div>
+          ) : filteredServices.length > 0 ? (
+            <div className="services-grid">
+              {filteredServices.map((service) => (
+                <div key={service.id} className="service-card-modern">
+                  <div className="card-header">
+                    <div className="card-title-group">
+                      <h3>{service.name}</h3>
+                      <span className="category-badge">{service.category}</span>
+                    </div>
+                    <div className="rating-badge">
+                      <FaStar className="star-icon" />
+                      {service.rating}
+                    </div>
+                  </div>
+
+                  <div className="card-body">
+                    <div className="info-row">
+                      <FaMapMarkerAlt className="info-icon" />
+                      <span className="info-text">{service.location}</span>
+                    </div>
+                    <div className="info-row">
+                      <FaPhone className="info-icon" />
+                      <span className="info-text">{service.contact}</span>
+                    </div>
+                  </div>
+
+                  <div className="card-footer">
+                    <a 
+                      href={getShopGoogleMapsLink(service)} 
+                      target="_blank" 
+                      rel="noreferrer"
+                      className="direction-btn-modern"
+                    >
+                      <FaArrowRight /> Directions
+                    </a>
+                    <button
+                      className="details-btn-modern"
+                      onClick={() => navigate(`/services/${service.id}`)}
+                    >
+                      Details
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="no-results-container">
+              <div className="no-results-icon">🔍</div>
+              <h3>No Services Found</h3>
+              <p>Try adjusting your search keywords or check nearby areas</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
 }
 
-export default MapView
+export default MapView;

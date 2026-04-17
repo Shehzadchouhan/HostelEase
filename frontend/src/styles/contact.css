@@ -37,7 +37,7 @@
 
 .info-card {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 20px;
   background: white;
   padding: 25px;
@@ -48,11 +48,27 @@
 
 .info-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0px 12px 40px rgba(0,0,0,0.1);
 }
 
 .info-icon {
   font-size: 26px;
   color: #2563eb;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.info-card h3 {
+  font-size: 18px;
+  color: #1e3a8a;
+  margin-bottom: 8px;
+}
+
+.info-card p {
+  color: #64748b;
+  font-size: 14px;
+  margin: 4px 0;
+  line-height: 1.5;
 }
 
 /* Form Section */
@@ -79,6 +95,7 @@
   font-size: 14px;
   margin-bottom: 6px;
   color: #334155;
+  font-weight: 500;
 }
 
 .contact-form input,
@@ -88,12 +105,15 @@
   border: 1px solid #e2e8f0;
   outline: none;
   font-size: 14px;
+  font-family: inherit;
   transition: 0.3s;
+  background: #f8fafc;
 }
 
 .contact-form input:focus,
 .contact-form textarea:focus {
   border-color: #2563eb;
+  background: white;
   box-shadow: 0px 0px 0px 3px rgba(37,99,235,0.1);
 }
 
@@ -104,24 +124,216 @@
   background: linear-gradient(to right, #2563eb, #1e40af);
   color: white;
   font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
   transition: 0.3s;
 }
 
-.contact-form button:hover {
+.contact-form button:hover:not(:disabled) {
   transform: translateY(-3px);
   box-shadow: 0px 6px 20px rgba(37,99,235,0.4);
 }
 
-.success-msg {
-  color: green;
-  font-size: 14px;
+.contact-form button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.success-container {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  border-radius: 10px;
+  padding: 16px;
   margin-top: 10px;
 }
 
+.success-msg {
+  color: #16a34a;
+  font-size: 14px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.ticket-msg {
+  color: #16a34a;
+  font-size: 13px;
+  margin: 8px 0 0 0;
+}
+
 /* Responsive */
+@media (max-width: 1024px) {
+  .contact-container {
+    padding: 60px 8%;
+  }
+
+  .contact-header h1 {
+    font-size: 32px;
+  }
+
+  .contact-wrapper {
+    gap: 40px;
+  }
+
+  .info-card {
+    padding: 20px;
+  }
+
+  .contact-form {
+    padding: 30px;
+  }
+}
+
 @media (max-width: 768px) {
+  .contact-container {
+    padding: 40px 20px;
+  }
+
+  .contact-header {
+    margin-bottom: 40px;
+  }
+
+  .contact-header h1 {
+    font-size: 26px;
+    margin-bottom: 8px;
+  }
+
+  .contact-header p {
+    font-size: 14px;
+  }
+
   .contact-wrapper {
     flex-direction: column;
+    gap: 30px;
+  }
+
+  .contact-info,
+  .contact-form {
+    flex: 1;
+  }
+
+  .info-card {
+    flex-direction: row;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .info-icon {
+    font-size: 22px;
+    min-width: 24px;
+  }
+
+  .info-card h3 {
+    font-size: 16px;
+  }
+
+  .info-card p {
+    font-size: 13px;
+  }
+
+  .contact-form {
+    padding: 24px;
+  }
+
+  .input-group label {
+    font-size: 13px;
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .contact-form button {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .success-msg {
+    font-size: 13px;
+  }
+
+  .ticket-msg {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-container {
+    padding: 30px 16px;
+  }
+
+  .contact-header h1 {
+    font-size: 22px;
+  }
+
+  .contact-header p {
+    font-size: 13px;
+  }
+
+  .contact-wrapper {
+    gap: 20px;
+  }
+
+  .info-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .info-icon {
+    font-size: 20px;
+  }
+
+  .info-card h3 {
+    font-size: 14px;
+  }
+
+  .info-card p {
+    font-size: 12px;
+  }
+
+  .contact-form {
+    padding: 20px;
+  }
+
+  .contact-form form {
+    gap: 16px;
+  }
+
+  .input-group {
+    gap: 4px;
+  }
+
+  .input-group label {
+    font-size: 12px;
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .contact-form textarea {
+    min-height: 100px;
+  }
+
+  .contact-form button {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .success-container {
+    padding: 12px;
+  }
+
+  .success-msg {
+    font-size: 12px;
+  }
+
+  .ticket-msg {
+    font-size: 11px;
   }
 }

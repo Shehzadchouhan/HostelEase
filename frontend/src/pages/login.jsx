@@ -1,16 +1,46 @@
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import loginImage from "../assets/login.png";
 import "../styles/login-module.css";
-
 import { motion } from "framer-motion";
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+import API from "../api/api";
+
 function Login() {
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({ emailOrPhone: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError("");
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await API.post("/auth/login", formData);
+      const { token, user } = res.data.data;
+
+      // ✅ Save token and user to localStorage
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // ✅ Redirect to services after login
+      navigate("/services");
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
-      {/* Simple Navbar (only Login + Register) */}
       <Navbar simple={true} />
 
       <div className="login-container">
@@ -24,43 +54,57 @@ function Login() {
         {/* Right Side */}
         <div className="right-section">
           <motion.div
-  className="login-card"
-  initial={{ opacity: 0, y: 50 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.6 }}
->
+            className="login-card"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
             <h2>Login to Your Account</h2>
 
-            <form className="login-form">
-              {/* Email */}
-              <label>Email or Phone</label>
-              <input type="text" placeholder="Enter your email or phone" />
+            <form className="login-form" onSubmit={handleLogin}>
 
-              {/* Password */}
+              <label>Email or Phone</label>
+              <input
+                type="text"
+                name="emailOrPhone"
+                placeholder="Enter your email or phone"
+                value={formData.emailOrPhone}
+                onChange={handleChange}
+                required
+              />
+
               <label>Password</label>
-              <input type="password" placeholder="Enter your password" />
+              <input
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
 
               <div className="forgot-password">Forgot password?</div>
 
-              <button
-                type="button"
-                className="login-btn"
-                onClick={() => navigate("/")}
-              >
-                Login
+              {/* ✅ Error Message */}
+              {error && (
+                <p style={{ color: "red", fontSize: "14px", margin: "0" }}>
+                  ⚠️ {error}
+                </p>
+              )}
+
+              <button type="submit" className="login-btn" disabled={loading}>
+                {loading ? "Logging in..." : "Login"}
               </button>
 
               <div className="divider">OR</div>
 
-              {/* Google Button */}
-              <button type="button" className="google-btn">
-                <img
-                  src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png"
-                  alt="Google logo"
-                  className="google-icon"
-                />
-                Continue with Google
-              </button>
+              <p style={{ textAlign: "center", fontSize: "14px", margin: "0" }}>
+                Don't have an account?{" "}
+                <Link to="/register" style={{ color: "#2563eb", fontWeight: "500" }}>
+                  Register here
+                </Link>
+              </p>
+
             </form>
           </motion.div>
         </div>
@@ -68,6 +112,5 @@ function Login() {
     </>
   );
 }
-
 
 export default Login;

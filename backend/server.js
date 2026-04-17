@@ -1,48 +1,55 @@
-require("dotenv").config();
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import authRoutes from "./routes/authRoutes.js";
+import shopRoutes from "./routes/shopRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
+dotenv.config();
 
 const app = express();
 
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/hostelease";
-const PORT = process.env.PORT || 5000;
-
-app.use(cors({
-  origin: FRONTEND_URL,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+// CORS Configuration
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
   credentials: true,
-}));
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
+};
+
+// Middleware
+app.use(cors(corsOptions));
 app.use(express.json());
 
-// Debug middleware (must be before routes)
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`, req.body);
-  next();
-});
+// MongoDB Connection
+mongoose
+  .connect(process.env.MONGO_URI || process.env.MONGODB_URI)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ MongoDB connection failed:", err));
 
-const shopRoutes = require("./routes/shopRoutes");
-const authRoutes = require("./routes/authRoutes");
-const contactRoutes = require("./routes/contactRoutes");
-
-app.use("/api/shops", shopRoutes);
+// Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/shops", shopRoutes);
 app.use("/api/contact", contactRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Server is running");
+// Health check
+app.get("/api/health", (req, res) => {
+  res.json({ message: "Server is running" });
 });
 
-mongoose.connect(MONGO_URI)
-  .then(() => {
-    console.log("MongoDB Connected");
-    app.listen(PORT, () => {
-      console.log(`Server started on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err);
-    process.exit(1);
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error("❌ Error:", err);
+  res.status(500).json({
+    success: false,
+    message: "Internal server error",
+    error: err.message
   });
+});
+
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});

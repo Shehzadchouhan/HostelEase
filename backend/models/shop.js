@@ -1,67 +1,56 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const shopSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  category: {
-    type: String,
-    required: true
-  },
-  location: {
-    type: {
+const shopSchema = new mongoose.Schema(
+  {
+    name: {
       type: String,
-      enum: ["Point"],
-      required: true
+      required: true,
+      trim: true
     },
-    coordinates: {
-      type: [Number],
-      required: true
+    category: {
+      type: String,
+      required: true,
+      enum: ["Stationery", "Laundry", "Shopping", "Food", "Medical", "Transport", "Grocery", "Pharmacy"]
+    },
+    // ✅ Change location to GeoJSON Point format
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point"
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        default: [77.1025, 28.7041]
+      },
+      address: {
+        type: String,
+        default: ""
+      }
+    },
+    phone: {
+      type: String,
+      default: ""
+    },
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
+    },
+    reviews: {
+      type: Number,
+      default: 0
+    },
+    description: {
+      type: String,
+      default: ""
     }
   },
-  contact: {
-    type: String
-  },
-  address: {
-    type: String,
-    default: ""
-  },
-  rating: {
-    type: Number,
-    default: 0
-  },
-  image: {
-    type: String,
-    default: null
-  },
-  description: {
-    type: String,
-    default: ""
-  },
-  pricing: [{
-    title: String,
-    price: String
-  }],
-  minimumOrder: {
-    type: String,
-    default: "₹0"
-  },
-  paymentMethods: [{
-    type: String
-  }],
-  highlights: [{
-    type: String
-  }],
-  reviews: [{
-    name: String,
-    rating: Number,
-    comment: String,
-    date: String
-  }]
-}, { timestamps: true });
+  { timestamps: true }
+);
 
-// 👇 IMPORTANT for location search
+// ✅ This index is REQUIRED for $near geospatial queries to work
 shopSchema.index({ location: "2dsphere" });
 
-module.exports = mongoose.model("Shop", shopSchema);
+export default mongoose.model("Shop", shopSchema);

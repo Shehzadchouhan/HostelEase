@@ -293,25 +293,407 @@
   opacity: 0.7;
 }
 
-/* RESPONSIVE */
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .hero {
+    padding: 80px 60px;
+  }
+
+  .hero-left {
+    max-width: 480px;
+  }
+
+  .hero-left h1 {
+    font-size: 40px;
+  }
+
+  .hero-left p {
+    font-size: 16px;
+  }
+
+  .hero-right img {
+    width: 420px;
+  }
+
+  .features {
+    padding: 80px 60px;
+  }
+
+  .features-header h2 {
+    font-size: 32px;
+  }
+
+  .features-container {
+    gap: 60px;
+  }
+
+  .card {
+    width: 280px;
+  }
+
+  .how-it-works {
+    padding: 80px 60px;
+  }
+
+  .how-header h2 {
+    font-size: 32px;
+  }
+
+  .steps-container {
+    gap: 50px;
+  }
+
+  .step {
+    max-width: 250px;
+  }
+
+  .cta-section {
+    padding: 80px 60px;
+  }
+
+  .cta-content h2 {
+    font-size: 32px;
+  }
+}
+
 @media (max-width: 768px) {
   .hero {
     flex-direction: column;
     text-align: center;
-    padding: 60px 20px;
+    padding: 60px 24px;
+    gap: 40px;
+  }
+
+  .hero-left {
+    max-width: 100%;
+  }
+
+  .hero-left h1 {
+    font-size: 32px;
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+
+  .hero-left p {
+    font-size: 16px;
+    margin-bottom: 24px;
   }
 
   .hero-buttons {
     justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    padding: 12px 28px;
+    font-size: 15px;
   }
 
   .hero-right img {
-    width: 300px;
-    margin-top: 40px;
+    width: 100%;
+    max-width: 340px;
+    margin-top: 0;
   }
 
   .features {
+    padding: 60px 24px;
+  }
+
+  .features-header h2 {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .features-header p {
+    font-size: 16px;
+    margin-bottom: 40px;
+  }
+
+  .features-container {
+    gap: 24px;
     flex-direction: column;
     align-items: center;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 350px;
+    padding: 16px 24px;
+    border-radius: 12px;
+  }
+
+  .icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .card h3 {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .card p {
+    font-size: 14px;
+  }
+
+  .how-it-works {
+    padding: 60px 24px;
+  }
+
+  .how-header h2 {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .how-header p {
+    font-size: 16px;
+    margin-bottom: 40px;
+  }
+
+  .steps-container {
+    gap: 32px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .step {
+    max-width: 100%;
+  }
+
+  .step-number {
+    width: 56px;
+    height: 56px;
+    font-size: 20px;
+  }
+
+  .step h3 {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .step p {
+    font-size: 14px;
+  }
+
+  .cta-section {
+    padding: 60px 24px;
+  }
+
+  .cta-content h2 {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+
+  .cta-content p {
+    font-size: 16px;
+    margin-bottom: 32px;
+  }
+
+  .cta-buttons {
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cta-primary,
+  .cta-secondary {
+    padding: 12px 28px;
+    font-size: 15px;
+  }
+
+  .footer {
+    padding: 40px 24px 20px;
+  }
+
+  .footer-container {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .footer-column {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 48px 16px;
+    gap: 32px;
+  }
+
+  .hero-left h1 {
+    font-size: 24px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .hero-left p {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    padding: 11px 20px;
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .hero-right img {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .features {
+    padding: 48px 16px;
+  }
+
+  .features-header h2 {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .features-header p {
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  .features-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .card {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .card h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .card p {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .how-it-works {
+    padding: 48px 16px;
+  }
+
+  .how-header h2 {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .how-header p {
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  .steps-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .step {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .step-number {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
+    font-size: 18px;
+  }
+
+  .step h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .step p {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .cta-section {
+    padding: 48px 16px;
+  }
+
+  .cta-content h2 {
+    font-size: 22px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .cta-content p {
+    font-size: 14px;
+    margin-bottom: 24px;
+    opacity: 0.95;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .cta-primary,
+  .cta-secondary {
+    width: 100%;
+    padding: 11px 20px;
+    font-size: 13px;
+  }
+
+  .footer {
+    padding: 32px 16px 16px;
+  }
+
+  .footer-container {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .footer-column {
+    max-width: 100%;
+  }
+
+  .footer-column h3,
+  .footer-column h4 {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+
+  .footer-column p {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .footer-bottom {
+    margin-top: 24px;
+    font-size: 12px;
   }
 }

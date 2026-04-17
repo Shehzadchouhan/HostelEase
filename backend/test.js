@@ -1,7 +1,9 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
-const User = require('./models/User');
+dotenv.config();
+
+import User from './models/User.js';
 
 async function test() {
   try {

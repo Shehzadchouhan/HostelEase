@@ -1,4 +1,4 @@
-const nodemailer = require("nodemailer");
+import nodemailer from "nodemailer";
 
 console.log("Email Configuration:");
 console.log("  USER:", process.env.EMAIL_USER);
@@ -164,4 +164,4 @@ const sendConfirmationEmail = async (contactData) => {
   }
 };
 
-module.exports = { sendSupportEmail, sendConfirmationEmail };
+export { sendSupportEmail, sendConfirmationEmail };

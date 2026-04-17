@@ -1,6 +1,8 @@
-const mongoose = require("mongoose");
-const Shop = require("./models/shop");
-require("dotenv").config();
+import mongoose from "mongoose";
+import Shop from "./models/shop.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 async function addSampleShop() {
   try {

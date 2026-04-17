@@ -153,9 +153,25 @@ background: linear-gradient(135deg, #f4f6ff, #c5c5c5);
 }
 
 /* RESPONSIVE */
+@media (max-width: 1024px) {
+  .left-section {
+    padding: 40px;
+  }
+
+  .left-section img {
+    width: 450px;
+  }
+
+  .register-card {
+    width: 300px;
+    padding: 24px;
+  }
+}
+
 @media (max-width: 768px) {
   .register-container {
     flex-direction: column;
+    min-height: 100vh;
   }
 
   .left-section {
@@ -164,11 +180,98 @@ background: linear-gradient(135deg, #f4f6ff, #c5c5c5);
 
   .right-section {
     width: 100%;
-    padding: 20px;
+    padding: 24px;
+    background: linear-gradient(135deg, #f4f6ff, #c5c5c5);
+    min-height: calc(100vh - 70px);
   }
 
   .register-card {
     width: 100%;
     max-width: 400px;
+    padding: 24px;
+    gap: 10px;
+  }
+
+  .register-card h2 {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .register-card input {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .register-card p {
+    font-size: 14px;
+  }
+
+  .register-btn {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .login-link {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-container {
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  .right-section {
+    padding: 16px;
+    min-height: calc(100vh - 60px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .register-card {
+    width: 100%;
+    padding: 20px;
+    border-radius: 12px;
+    gap: 8px;
+  }
+
+  .register-card h2 {
+    font-size: 20px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .register-card input {
+    width: 100%;
+    padding: 10px;
+    font-size: 13px;
+    border-radius: 6px;
+  }
+
+  .register-card input::placeholder {
+    font-size: 12px;
+  }
+
+  .register-card p {
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .register-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+
+  .login-link {
+    font-size: 12px;
+    margin-top: 12px;
+  }
+
+  .login-link a {
+    font-weight: 600;
   }
 }

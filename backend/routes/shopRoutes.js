@@ -1,53 +1,23 @@
-const express = require("express");
+import express from "express";
+import {
+  getAllShops,
+  getShopById,
+  createShop,
+  updateShop,
+  deleteShop,
+  getNearbyShops
+} from "../controllers/shopController.js";
+
 const router = express.Router();
-const Shop = require("../models/shop");
-const { getShops, getNearbyShops } = require("../controllers/shopController");
 
-// 📥 Get All Shops (with search and category filters)
-router.get("/", getShops);
+// Public routes
+router.get("/", getAllShops);
+router.get("/nearby", getNearbyShops);  // 🎯 Get nearby shops with geospatial query
+router.get("/:id", getShopById);
 
-// 🎯 Get Nearby Shops (within 2km radius)
-router.get("/nearby", getNearbyShops);
+// Protected routes (Admin only)
+router.post("/", createShop);
+router.put("/:id", updateShop);
+router.delete("/:id", deleteShop);
 
-// 📄 Get Single Shop by ID
-router.get("/:id", async (req, res) => {
-  try {
-    const shop = await Shop.findById(req.params.id);
-    if (!shop) {
-      return res.status(404).json({
-        success: false,
-        message: "Shop not found"
-      });
-    }
-
-    res.json({
-      success: true,
-      data: shop
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-});
-
-// ➕ Add Shop
-router.post("/add", async (req, res) => {
-  try {
-    const shop = new Shop(req.body);
-    await shop.save();
-
-    res.status(201).json({
-      success: true,
-      data: shop
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-});
-
-module.exports = router;
+export default router;

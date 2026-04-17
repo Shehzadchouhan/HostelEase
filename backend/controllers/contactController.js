@@ -1,5 +1,5 @@
-const Contact = require("../models/Contact");
-const { sendSupportEmail, sendConfirmationEmail } = require("../utils/emailService");
+import Contact from "../models/Contact.js";
+import { sendSupportEmail, sendConfirmationEmail } from "../utils/emailService.js";
 
 // Submit a new contact message
 const submitContact = async (req, res) => {
@@ -181,7 +181,7 @@ const deleteContact = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
   submitContact,
   getAllContacts,
   getContactByTicketId,
