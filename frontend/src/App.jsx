@@ -1,12 +1,12 @@
 import { Routes, Route } from "react-router-dom"
 
-import Landing from "./pages/landing"
-import Login from "./pages/login"
+import Landing from "./pages/Landing"
+import Login from "./pages/Login"
 import Register from "./pages/Register"
 import MapView from "./pages/MapView"
 import Services from "./pages/Services"
 import ServiceDetails from "./pages/ServiceDetails"
-import Contact from "./pages/contact"
+import Contact from "./pages/Contact"
 
 function App() {
   return (
