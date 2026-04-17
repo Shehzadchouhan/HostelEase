@@ -2,11 +2,11 @@ import { Routes, Route } from "react-router-dom"
 
 import Landing from "./pages/landing"
 import Login from "./pages/login"
-import Register from "./pages/Register"
+import Register from "./pages/register"
 import MapView from "./pages/MapView"
 import Services from "./pages/Services"
 import ServiceDetails from "./pages/ServiceDetails"
-import Contact from "./pages/Contact"
+import Contact from "./pages/contact"
 
 function App() {
   return (
