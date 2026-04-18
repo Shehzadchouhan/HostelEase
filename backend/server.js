@@ -53,3 +53,13 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+
+import mongoose from "mongoose";
+
+app.get("/api/debug-shops", async (req, res) => {
+  const raw = await mongoose.connection.db
+    .collection("shops")
+    .find({})
+    .toArray();
+  res.json(raw);
+});
