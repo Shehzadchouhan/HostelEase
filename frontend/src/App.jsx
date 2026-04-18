@@ -7,6 +7,7 @@ import MapView from "./pages/MapView"
 import Services from "./pages/Services"
 import ServiceDetails from "./pages/ServiceDetails"
 import Contact from "./pages/Contact"
+import ResetPassword from "./pages/ResetPassword"
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Route path="/service/:id" element={<ServiceDetails />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
     </Routes>
   )
 }
