@@ -2,7 +2,7 @@ import Navbar from "../components/Navbar"
 import "../styles/services.css"
 import { getShops } from "../api/api"
 import { FaStar, FaRegStar, FaMapMarkerAlt, FaFire } from "react-icons/fa"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 const defaultShopImages = [
@@ -13,6 +13,20 @@ const defaultShopImages = [
   "https://via.placeholder.com/150/98D8C8/FFFFFF?text=Shop+5",
   "https://via.placeholder.com/150/F7DC6F/FFFFFF?text=Shop+6",
 ]
+
+// ✅ Move calculateDistance outside component to prevent recreating
+const calculateDistance = (lat1, lng1, lat2, lng2) => {
+  const R = 6371
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLng = (lng2 - lng1) * Math.PI / 180
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) *
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2)
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
 
 function Services() {
   const navigate = useNavigate()
@@ -27,43 +41,53 @@ function Services() {
 
   const servicesPerPage = 3
 
+  // ✅ Combine location and data fetching
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setUserLocation({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        })
-      },
-      () => {
-        setUserLocation({ lat: 30.9000, lng: 75.8573 })
-      }
-    )
-  }, [])
-
-  useEffect(() => {
-    const fetchServices = async () => {
+    const getLocationAndServices = async () => {
       try {
-        setLoading(true)
+        // Get user location
+        const location = await new Promise((resolve) => {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              resolve({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              })
+            },
+            () => {
+              resolve({ lat: 30.9000, lng: 75.8573 })
+            }
+          )
+        })
+
+        setUserLocation(location)
+
+        // Fetch shops
         const response = await getShops()
         const shops = response.data.data || []
 
-        const transformedServices = shops.map((shop, index) => ({
-          id: shop._id,
-          name: shop.name,
-          category: shop.category,
-          lat: shop.location?.coordinates ? shop.location.coordinates[1] : 30.9,
-          lng: shop.location?.coordinates ? shop.location.coordinates[0] : 75.8573,
-          // ✅ Use real data from DB — no more random values
-          rating: shop.rating || 0,
-          reviews: shop.reviews?.length || 0,
-          address: shop.address || shop.category || "Nearby Area",
-          basePrice: shop.pricing?.[0]?.price?.replace(/[^0-9]/g, "") || "0",
-          contact: shop.contact || "",
-          image: shop.image || defaultShopImages[index % defaultShopImages.length],
-          distance: 0,
-        }))
+        const transformedServices = shops.map((shop, index) => {
+          const lat = shop.location?.coordinates ? shop.location.coordinates[1] : 30.9
+          const lng = shop.location?.coordinates ? shop.location.coordinates[0] : 75.8573
+          
+          return {
+            id: shop._id,
+            name: shop.name,
+            category: shop.category,
+            lat,
+            lng,
+            rating: shop.rating || 0,
+            reviews: shop.reviews?.length || 0,
+            address: shop.address || shop.category || "Nearby Area",
+            basePrice: shop.pricing?.[0]?.price?.replace(/[^0-9]/g, "") || "0",
+            contact: shop.contact || "",
+            image: shop.image || defaultShopImages[index % defaultShopImages.length],
+            distance: calculateDistance(location.lat, location.lng, lat, lng),
+          }
+        })
 
+        // Sort by distance
+        transformedServices.sort((a, b) => a.distance - b.distance)
         setServices(transformedServices)
       } catch (error) {
         console.error("Error fetching services:", error)
@@ -72,65 +96,52 @@ function Services() {
         setLoading(false)
       }
     }
-    fetchServices()
+
+    getLocationAndServices()
   }, [])
-
-  useEffect(() => {
-    if (!userLocation || services.length === 0) return
-
-    const calculateDistance = (lat1, lng1, lat2, lng2) => {
-      const R = 6371
-      const dLat = (lat2 - lat1) * Math.PI / 180
-      const dLng = (lng2 - lng1) * Math.PI / 180
-      const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * Math.PI / 180) *
-          Math.cos(lat2 * Math.PI / 180) *
-          Math.sin(dLng / 2) *
-          Math.sin(dLng / 2)
-      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    }
-
-    const updated = services.map((s) => ({
-      ...s,
-      distance: calculateDistance(userLocation.lat, userLocation.lng, s.lat, s.lng),
-    }))
-    updated.sort((a, b) => a.distance - b.distance)
-    setServices(updated)
-  }, [userLocation])
 
   useEffect(() => {
     setCurrentPage(1)
   }, [search, activeCategory, sortOption, activeFilter])
 
-  const filteredServices = services
-    .filter((s) => {
-      const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase())
-      const matchesCategory =
-        activeCategory === "All" ||
-        s.category.toLowerCase() === activeCategory.toLowerCase()
-      const matchesFilter = activeFilter === "top" ? s.rating >= 4 : true
-      return matchesSearch && matchesCategory && matchesFilter
-    })
-    .sort((a, b) => {
-      if (sortOption === "rating") return (b.rating || 0) - (a.rating || 0)
-      if (sortOption === "priceHigh") return (b.basePrice || 0) - (a.basePrice || 0)
-      return 0
-    })
+  // ✅ Memoize filtered and sorted services
+  const filteredServices = useMemo(() => {
+    return services
+      .filter((s) => {
+        const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase())
+        const matchesCategory =
+          activeCategory === "All" ||
+          s.category.toLowerCase() === activeCategory.toLowerCase()
+        const matchesFilter = activeFilter === "top" ? s.rating >= 4 : true
+        return matchesSearch && matchesCategory && matchesFilter
+      })
+      .sort((a, b) => {
+        if (sortOption === "rating") return (b.rating || 0) - (a.rating || 0)
+        if (sortOption === "priceHigh") return (b.basePrice || 0) - (a.basePrice || 0)
+        return 0
+      })
+  }, [services, search, activeCategory, sortOption, activeFilter])
 
-  const indexOfLast = currentPage * servicesPerPage
-  const indexOfFirst = indexOfLast - servicesPerPage
-  const currentServices = filteredServices.slice(indexOfFirst, indexOfLast)
-  const totalPages = Math.ceil(filteredServices.length / servicesPerPage)
+  // ✅ Memoize pagination calculation
+  const { indexOfLast, indexOfFirst, currentServices, totalPages } = useMemo(() => {
+    const last = currentPage * servicesPerPage
+    const first = last - servicesPerPage
+    const current = filteredServices.slice(first, last)
+    const total = Math.ceil(filteredServices.length / servicesPerPage)
+    return { indexOfLast: last, indexOfFirst: first, currentServices: current, totalPages: total }
+  }, [filteredServices, currentPage, servicesPerPage])
 
-  const renderStars = (rating = 3) =>
+  // ✅ Memoize star rendering
+  const renderStars = useCallback((rating = 3) =>
     [...Array(5)].map((_, i) =>
       i < Math.floor(rating) ? (
         <FaStar key={i} className="star filled" />
       ) : (
         <FaRegStar key={i} className="star" />
       )
-    )
+    ),
+    []
+  )
 
   const SkeletonCard = () => (
     <div className="service-card skeleton">
@@ -138,6 +149,47 @@ function Services() {
       <div className="skeleton-text"></div>
       <div className="skeleton-text small"></div>
     </div>
+  )
+
+  // ✅ Memoize event handlers
+  const handleCategoryClick = useCallback((category) => {
+    setActiveCategory(category)
+  }, [])
+
+  const handleSearchChange = useCallback((e) => {
+    setSearch(e.target.value)
+  }, [])
+
+  const handleFilterClick = useCallback((filter) => {
+    setActiveFilter(filter)
+  }, [])
+
+  const handleServiceClick = useCallback((serviceId) => {
+    navigate(`/service/${serviceId}`)
+  }, [navigate])
+
+  const handlePageChange = useCallback((newPage) => {
+    setCurrentPage(newPage)
+  }, [])
+
+  // ✅ Memoize skeleton cards array
+  const skeletonCards = useMemo(() => 
+    Array(servicesPerPage).fill(0).map((_, i) => <SkeletonCard key={i} />), 
+    [servicesPerPage]
+  )
+
+  // ✅ Memoize page buttons
+  const pageButtons = useMemo(() => 
+    [...Array(totalPages)].map((_, i) => (
+      <button
+        key={i}
+        className={currentPage === i + 1 ? "active-page" : ""}
+        onClick={() => handlePageChange(i + 1)}
+      >
+        {i + 1}
+      </button>
+    )), 
+    [totalPages, currentPage, handlePageChange]
   )
 
   return (
@@ -149,7 +201,7 @@ function Services() {
             <button
               key={category}
               className={`category-btn ${activeCategory === category ? "active-category" : ""}`}
-              onClick={() => setActiveCategory(category)}
+              onClick={() => handleCategoryClick(category)}
             >
               {category === "All" ? "All Services" : category}
             </button>
@@ -161,20 +213,20 @@ function Services() {
             type="text"
             placeholder="Search services..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={handleSearchChange}
           />
         </div>
 
         <div className="filter-row">
           <button
             className={`filter-btn ${activeFilter === "nearby" ? "active" : ""}`}
-            onClick={() => setActiveFilter("nearby")}
+            onClick={() => handleFilterClick("nearby")}
           >
             📍 Nearby
           </button>
           <button
             className={`filter-btn ${activeFilter === "top" ? "active" : ""}`}
-            onClick={() => setActiveFilter("top")}
+            onClick={() => handleFilterClick("top")}
           >
             ⭐ Top Rated (4+)
           </button>
@@ -182,17 +234,17 @@ function Services() {
 
         <div className="services-list">
           {loading ? (
-            Array(servicesPerPage).fill(0).map((_, i) => <SkeletonCard key={i} />)
+            skeletonCards
           ) : currentServices.length > 0 ? (
             currentServices.map((service, index) => (
               <div
                 className="service-card clickable"
                 key={service.id}
-                onClick={() => navigate(`/service/${service.id}`)}
+                onClick={() => handleServiceClick(service.id)}
               >
                 <div className="service-left">
                   <div className="service-icon-circle">
-                    <img src={service.image} alt={service.name} />
+                    <img src={service.image} alt={service.name} loading="lazy" />
                   </div>
                   <div className="service-info">
                     <div className="service-header">
@@ -236,21 +288,13 @@ function Services() {
 
         {!loading && totalPages > 1 && (
           <div className="pagination">
-            <button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
+            <button disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
               Prev
             </button>
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                className={currentPage === i + 1 ? "active-page" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
+            {pageButtons}
             <button
               disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(currentPage + 1)}
+              onClick={() => handlePageChange(currentPage + 1)}
             >
               Next
             </button>

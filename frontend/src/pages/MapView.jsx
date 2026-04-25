@@ -1,6 +1,6 @@
 import Navbar from "../components/Navbar";
 import "../styles/mapview.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch, FaMapMarkerAlt, FaPhone, FaStar, FaArrowRight, FaMapPin } from "react-icons/fa";
 import { getShops, getNearbyShops } from "../api/api";
@@ -12,42 +12,40 @@ function MapView() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // 📍 Get user's current geolocation
+  // ✅ Combine geolocation and data fetching
   useEffect(() => {
-    if (!navigator.geolocation) {
-      console.warn("Geolocation not supported");
-      return;
-    }
-    
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const location = { 
-          lat: pos.coords.latitude, 
-          lng: pos.coords.longitude 
-        };
-        setUserLocation(location);
-      },
-      (err) => console.log("Geolocation error:", err)
-    );
-  }, []);
-
-  // 🎯 Fetch nearby shops or all shops based on user location
-  useEffect(() => {
-    const fetchServices = async () => {
+    const getLocationAndServices = async () => {
       try {
-        setLoading(true);
-        let response;
+        // Get user location
+        let location = null;
 
-        // If user location is available, fetch nearby shops (within 2km)
-        if (userLocation) {
-          response = await getNearbyShops(userLocation.lat, userLocation.lng);
+        if (navigator.geolocation) {
+          location = await new Promise((resolve) => {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                resolve({
+                  lat: pos.coords.latitude,
+                  lng: pos.coords.longitude
+                });
+              },
+              () => {
+                resolve(null);
+              }
+            );
+          });
+        }
+
+        setUserLocation(location);
+
+        // Fetch shops
+        let response;
+        if (location) {
+          response = await getNearbyShops(location.lat, location.lng);
         } else {
-          // Fallback: get all shops if geolocation not available
           response = await getShops();
         }
 
         const shops = response.data.data || [];
-
         const transformedServices = shops.map((shop) => ({
           id: shop._id,
           name: shop.name,
@@ -73,42 +71,52 @@ function MapView() {
       }
     };
 
-    fetchServices();
-  }, [userLocation]);
+    getLocationAndServices();
+  }, []);
 
-  const filteredServices = services.filter((s) =>
-    s.name.toLowerCase().includes(search.toLowerCase())
+  // ✅ Memoize filtered services
+  const filteredServices = useMemo(() => 
+    services.filter((s) =>
+      s.name.toLowerCase().includes(search.toLowerCase())
+    ),
+    [services, search]
   );
 
-  // 🗺️ Generate Google Maps link for user location
-  const getUserMapLink = () => {
+  // ✅ Memoize map link functions
+  const getUserMapLink = useCallback(() => {
     if (!userLocation) return null;
     return `https://www.google.com/maps/?q=${userLocation.lat},${userLocation.lng}`;
-  };
+  }, [userLocation]);
 
-  // 🗺️ Generate OpenStreetMap link for user location
-  const getUserOSMLink = () => {
+  const getUserOSMLink = useCallback(() => {
     if (!userLocation) return null;
     return `https://www.openstreetmap.org/?mlat=${userLocation.lat}&mlon=${userLocation.lng}&zoom=16`;
-  };
+  }, [userLocation]);
 
-  // 🗺️ Generate Google Maps link for shop
-  const getShopGoogleMapsLink = (shop) => {
+  const getShopGoogleMapsLink = useCallback((shop) => {
     if (!shop.coordinates || shop.coordinates.length < 2) {
       return "https://www.google.com/maps";
     }
     const [lng, lat] = shop.coordinates;
     return `https://www.google.com/maps/?q=${lat},${lng}`;
-  };
+  }, []);
 
-  // 🗺️ Generate OpenStreetMap link for shop
-  const getShopOSMLink = (shop) => {
+  const getShopOSMLink = useCallback((shop) => {
     if (!shop.coordinates || shop.coordinates.length < 2) {
       return "https://www.openstreetmap.org/?zoom=15";
     }
     const [lng, lat] = shop.coordinates;
     return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=16&marker=${lat},${lng}`;
-  };
+  }, []);
+
+  // ✅ Memoize handlers
+  const handleSearchChange = useCallback((e) => {
+    setSearch(e.target.value);
+  }, []);
+
+  const handleServiceDetails = useCallback((serviceId) => {
+    navigate(`/services/${serviceId}`);
+  }, [navigate]);
 
   return (
     <>
@@ -121,14 +129,14 @@ function MapView() {
           </div>
         </div>
 
-        <div className="mapview-search-section">
+          <div className="mapview-search-section">
           <div className="search-wrapper">
             <FaSearch className="search-icon" />
             <input
               type="text"
               placeholder="Search services..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={handleSearchChange}
             />
           </div>
         </div>
@@ -213,7 +221,7 @@ function MapView() {
                     </a>
                     <button
                       className="details-btn-modern"
-                      onClick={() => navigate(`/services/${service.id}`)}
+                      onClick={() => handleServiceDetails(service.id)}
                     >
                       Details
                     </button>
