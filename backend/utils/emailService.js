@@ -5,23 +5,17 @@ console.log("  USER:", process.env.EMAIL_USER);
 console.log("  PASSWORD:", process.env.EMAIL_PASSWORD ? "Set" : "Missing");
 console.log("  SUPPORT_EMAIL:", process.env.SUPPORT_EMAIL);
 
-// Configure email transporter
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER || "supporthostelease@gmail.com",
-    pass: process.env.EMAIL_PASSWORD || "", // Use Gmail App Password
-  },
-});
-
-// Verify transporter connection
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("Email transporter error:", error.message);
-  } else {
-    console.log("Email transporter ready to send messages");
-  }
-});
+// Get email transporter - Create lazily to ensure env vars are loaded
+const getTransporter = () => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER || "supporthostelease@gmail.com",
+      pass: process.env.EMAIL_PASSWORD || "", // Use Gmail App Password
+    },
+  });
+  return transporter;
+};
 
 // Send email to support
 const sendSupportEmail = async (contactData) => {
@@ -86,7 +80,7 @@ const sendSupportEmail = async (contactData) => {
 
   try {
     console.log("Sending support email to:", process.env.SUPPORT_EMAIL);
-    const info = await transporter.sendMail({
+    const info = await getTransporter().sendMail({
       from: process.env.EMAIL_USER || "supporthostelease@gmail.com",
       to: process.env.SUPPORT_EMAIL || "supporthostelease@gmail.com",
       subject: `[${ticketId}] New Support Ticket: ${subject}`,
@@ -151,7 +145,7 @@ const sendConfirmationEmail = async (contactData) => {
 
   try {
     console.log("🔄 Sending confirmation email to:", email);
-    const info = await transporter.sendMail({
+    const info = await getTransporter().sendMail({
       from: process.env.EMAIL_USER || "supporthostelease@gmail.com",
       to: email,
       subject: `Ticket Confirmation: ${ticketId} - HostelEase Support`,

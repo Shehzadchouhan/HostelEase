@@ -236,17 +236,18 @@
 .cta-secondary {
   padding: 15px 40px;
   font-size: 16px;
-  background: transparent;
-  border: 2px solid white;
-  color: white;
+  background: white;
+  color: #1e3a8a;
+  border: none;
   border-radius: 8px;
   cursor: pointer;
+  font-weight: bold;
   transition: 0.3s ease;
 }
 
 .cta-secondary:hover {
-  background: white;
-  color: #1e3a8a;
+  transform: translateY(-3px);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* FOOTER */

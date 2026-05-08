@@ -1,7 +1,6 @@
 import Navbar from "../components/Navbar";
 import "../styles/mapview.css";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import { FaSearch, FaMapMarkerAlt, FaPhone, FaStar, FaArrowRight, FaMapPin } from "react-icons/fa";
 import { getShops, getNearbyShops } from "../api/api";
 
@@ -10,29 +9,46 @@ function MapView() {
   const [search, setSearch] = useState("");
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   // ✅ Combine geolocation and data fetching
   useEffect(() => {
     const getLocationAndServices = async () => {
       try {
-        // Get user location
+        // Get user location with timeout
         let location = null;
 
         if (navigator.geolocation) {
           location = await new Promise((resolve) => {
+            const timeout = setTimeout(() => {
+              console.warn("Geolocation timeout - using default location");
+              resolve(null);
+            }, 5000); // 5 second timeout
+
             navigator.geolocation.getCurrentPosition(
               (pos) => {
+                clearTimeout(timeout);
                 resolve({
                   lat: pos.coords.latitude,
                   lng: pos.coords.longitude
                 });
               },
-              () => {
-                resolve(null);
-              }
+              (error) => {
+                clearTimeout(timeout);
+                console.error("Geolocation error:", error);
+                resolve(null); // Fall back to null
+              },
+              { timeout: 5000, enableHighAccuracy: false }
             );
           });
+        }
+
+        // Fallback location (Delhi) if geolocation fails
+        if (!location) {
+          location = {
+            lat: 28.7041,
+            lng: 77.1025
+          };
+          console.log("Using default location (Delhi)");
         }
 
         setUserLocation(location);
@@ -88,11 +104,6 @@ function MapView() {
     return `https://www.google.com/maps/?q=${userLocation.lat},${userLocation.lng}`;
   }, [userLocation]);
 
-  const getUserOSMLink = useCallback(() => {
-    if (!userLocation) return null;
-    return `https://www.openstreetmap.org/?mlat=${userLocation.lat}&mlon=${userLocation.lng}&zoom=16`;
-  }, [userLocation]);
-
   const getShopGoogleMapsLink = useCallback((shop) => {
     if (!shop.coordinates || shop.coordinates.length < 2) {
       return "https://www.google.com/maps";
@@ -101,22 +112,10 @@ function MapView() {
     return `https://www.google.com/maps/?q=${lat},${lng}`;
   }, []);
 
-  const getShopOSMLink = useCallback((shop) => {
-    if (!shop.coordinates || shop.coordinates.length < 2) {
-      return "https://www.openstreetmap.org/?zoom=15";
-    }
-    const [lng, lat] = shop.coordinates;
-    return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=16&marker=${lat},${lng}`;
-  }, []);
-
   // ✅ Memoize handlers
   const handleSearchChange = useCallback((e) => {
     setSearch(e.target.value);
   }, []);
-
-  const handleServiceDetails = useCallback((serviceId) => {
-    navigate(`/services/${serviceId}`);
-  }, [navigate]);
 
   return (
     <>
@@ -159,14 +158,6 @@ function MapView() {
                   className="view-map-btn"
                 >
                   <FaMapPin /> Google Maps
-                </a>
-                <a 
-                  href={getUserOSMLink()} 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="view-map-btn osm-btn"
-                >
-                  <FaMapPin /> OSM
                 </a>
               </div>
             </div>
@@ -219,12 +210,6 @@ function MapView() {
                     >
                       <FaArrowRight /> Directions
                     </a>
-                    <button
-                      className="details-btn-modern"
-                      onClick={() => handleServiceDetails(service.id)}
-                    >
-                      Details
-                    </button>
                   </div>
                 </div>
               ))}

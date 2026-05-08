@@ -5,15 +5,6 @@ import { FaStar, FaRegStar, FaMapMarkerAlt, FaFire } from "react-icons/fa"
 import { useState, useEffect, useMemo, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-const defaultShopImages = [
-  "https://via.placeholder.com/150/FF6B6B/FFFFFF?text=Shop+1",
-  "https://via.placeholder.com/150/4ECDC4/FFFFFF?text=Shop+2",
-  "https://via.placeholder.com/150/45B7D1/FFFFFF?text=Shop+3",
-  "https://via.placeholder.com/150/FFA07A/FFFFFF?text=Shop+4",
-  "https://via.placeholder.com/150/98D8C8/FFFFFF?text=Shop+5",
-  "https://via.placeholder.com/150/F7DC6F/FFFFFF?text=Shop+6",
-]
-
 // ✅ Move calculateDistance outside component to prevent recreating
 const calculateDistance = (lat1, lng1, lat2, lng2) => {
   const R = 6371
@@ -41,24 +32,15 @@ function Services() {
 
   const servicesPerPage = 3
 
-  // ✅ Combine location and data fetching
+  // Default location (Chandigarh)
+  const DEFAULT_LOCATION = { lat: 30.7333, lng: 76.7794 }
+
+  // ✅ Fetch services with default location (no geolocation on mount)
   useEffect(() => {
-    const getLocationAndServices = async () => {
+    const getServices = async () => {
       try {
-        // Get user location
-        const location = await new Promise((resolve) => {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              resolve({
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              })
-            },
-            () => {
-              resolve({ lat: 30.9000, lng: 75.8573 })
-            }
-          )
-        })
+        // Use default location initially
+        const location = DEFAULT_LOCATION
 
         setUserLocation(location)
 
@@ -66,9 +48,16 @@ function Services() {
         const response = await getShops()
         const shops = response.data.data || []
 
+        if (!shops || shops.length === 0) {
+          console.warn("No shops found in database")
+          setServices([])
+          setLoading(false)
+          return
+        }
+
         const transformedServices = shops.map((shop, index) => {
-          const lat = shop.location?.coordinates ? shop.location.coordinates[1] : 30.9
-          const lng = shop.location?.coordinates ? shop.location.coordinates[0] : 75.8573
+          const lat = shop.location?.coordinates ? shop.location.coordinates[1] : DEFAULT_LOCATION.lat
+          const lng = shop.location?.coordinates ? shop.location.coordinates[0] : DEFAULT_LOCATION.lng
           
           return {
             id: shop._id,
@@ -81,7 +70,7 @@ function Services() {
             address: shop.address || shop.category || "Nearby Area",
             basePrice: shop.pricing?.[0]?.price?.replace(/[^0-9]/g, "") || "0",
             contact: shop.contact || "",
-            image: shop.image || defaultShopImages[index % defaultShopImages.length],
+            image: shop.image || "https://images.unsplash.com/photo-1488459716781-6e3100ce3ce0?w=200&h=200&fit=crop",
             distance: calculateDistance(location.lat, location.lng, lat, lng),
           }
         })
@@ -97,7 +86,69 @@ function Services() {
       }
     }
 
-    getLocationAndServices()
+    getServices()
+  }, [])
+
+  // ✅ Get user's actual location (only when user clicks button - OPTIONAL)
+  const getUserLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      alert("❌ Geolocation is not supported by your browser")
+      return
+    }
+
+    console.log("📍 Requesting user location...")
+
+    // Use geolocation with options
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const newLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        }
+        setUserLocation(newLocation)
+        
+        // Recalculate distances with new location
+        setServices((prevServices) =>
+          prevServices
+            .map((service) => ({
+              ...service,
+              distance: calculateDistance(
+                newLocation.lat,
+                newLocation.lng,
+                service.lat,
+                service.lng
+              ),
+            }))
+            .sort((a, b) => a.distance - b.distance)
+        )
+        console.log("✅ Location updated:", newLocation)
+        alert(`✅ Location updated! Your coordinates: ${newLocation.lat.toFixed(4)}, ${newLocation.lng.toFixed(4)}`)
+      },
+      (error) => {
+        console.error("❌ Geolocation error:", error)
+        let errorMsg = "Could not get your location. "
+        
+        // Provide detailed error message
+        if (error.code === error.PERMISSION_DENIED) {
+          errorMsg += "You denied permission. To fix: Go to browser settings > Privacy > Site permissions > Location and allow access."
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          errorMsg += "Your position data is unavailable."
+        } else if (error.code === error.TIMEOUT) {
+          errorMsg += "The request timed out."
+        } else {
+          errorMsg += error.message || "Unknown error"
+        }
+        
+        errorMsg += "\n\nUsing default location (Chandigarh) for now."
+        alert(errorMsg)
+        console.warn("Geolocation error details:", error)
+      },
+      {
+        enableHighAccuracy: false,  // Use WiFi/IP geolocation (faster, less accurate)
+        timeout: 10000,             // 10 second timeout
+        maximumAge: 0               // Don't use cached location
+      }
+    )
   }, [])
 
   useEffect(() => {
@@ -197,7 +248,7 @@ function Services() {
       <Navbar />
       <div className="services-container">
         <div className="category-tabs">
-          {["All", "Laundry", "Food", "Medical", "Repair", "Barber", "Stationery"].map((category) => (
+          {["All", "Stationery", "Laundry", "Shopping", "Food", "Medical", "Transport", "Grocery", "Pharmacy"].map((category) => (
             <button
               key={category}
               className={`category-btn ${activeCategory === category ? "active-category" : ""}`}
@@ -229,6 +280,13 @@ function Services() {
             onClick={() => handleFilterClick("top")}
           >
             ⭐ Top Rated (4+)
+          </button>
+          <button
+            className="filter-btn location-btn"
+            onClick={getUserLocation}
+            title="Click to use your current location for better distance calculation"
+          >
+            🌍 Use My Location
           </button>
         </div>
 

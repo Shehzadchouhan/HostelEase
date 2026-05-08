@@ -10,9 +10,22 @@ import contactRoutes from "./routes/contactRoutes.js";
 
 const app = express();
 
-// CORS Configuration
+// CORS Configuration - Allow both localhost (dev) and production
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      "http://localhost:5173",           // Local dev
+      "http://localhost:5174",           // Local dev (fallback port)
+      "http://localhost:3000",           // Alternative local
+      "https://hostel-ease-sigma.vercel.app" // Production
+    ];
+    
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]

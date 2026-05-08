@@ -48,9 +48,13 @@ function Navbar({ simple }) {
           ) : (
             <>
               <li><Link to="/">Home</Link></li>
-              <li><Link to="/services">Services</Link></li>
-              <li><Link to="/map">Map</Link></li>
-              <li><Link to="/contact">Contact</Link></li>
+              {user && (
+                <>
+                  <li><Link to="/services">Services</Link></li>
+                  <li><Link to="/map">Map</Link></li>
+                  <li><Link to="/contact">Contact</Link></li>
+                </>
+              )}
             </>
           )}
         </ul>
@@ -102,9 +106,13 @@ function Navbar({ simple }) {
         {!simple && (
           <>
             <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
-            <Link to="/services" onClick={() => setMenuOpen(false)}>Services</Link>
-            <Link to="/map" onClick={() => setMenuOpen(false)}>Map</Link>
-            <Link to="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
+            {user && (
+              <>
+                <Link to="/services" onClick={() => setMenuOpen(false)}>Services</Link>
+                <Link to="/map" onClick={() => setMenuOpen(false)}>Map</Link>
+                <Link to="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
+              </>
+            )}
           </>
         )}
         {!user ? (

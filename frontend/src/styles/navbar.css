@@ -86,7 +86,7 @@
 }
 
 .register-btn {
-  background: #2563eb;
+  background: #2563eb !important; 
   color: white !important;
   padding: 9px 20px;
   border-radius: 8px;

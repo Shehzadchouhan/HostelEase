@@ -45,7 +45,19 @@ const shopSchema = new mongoose.Schema(
     description: {
       type: String,
       default: ""
-    }
+    },
+    image: {
+      type: String,
+      default: "https://images.unsplash.com/photo-1488459716781-6e3100ce3ce0?w=200&h=200&fit=crop"
+    },
+    pricing: [
+      {
+        title: String,
+        price: String
+      }
+    ],
+    paymentMethods: [String],
+    highlights: [String]
   },
   { timestamps: true }
 );

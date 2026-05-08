@@ -44,13 +44,6 @@ const dummyReviews = [
   { name: "Amit Patel", rating: 5, comment: "Outstanding quality. Highly recommended!", date: "10 days ago" },
 ];
 
-const galleryImages = [
-  "https://via.placeholder.com/800x500?text=Shop+Image+1",
-  "https://via.placeholder.com/800x500?text=Shop+Image+2",
-  "https://via.placeholder.com/800x500?text=Shop+Image+3",
-  "https://via.placeholder.com/800x500?text=Shop+Image+4",
-];
-
 function ServiceDetails() {
   const { id } = useParams();
   const [service, setService] = useState(null);
@@ -76,15 +69,15 @@ function ServiceDetails() {
           // ✅ Real data first, fallback only if empty
           rating: shop.rating || 4.5,
           top: (shop.rating || 4.5) >= 4,
-          image: shop.image || null,
-          images: galleryImages,
+          image: shop.image || "https://images.unsplash.com/photo-1488459716781-6e3100ce3ce0?w=800&h=600&fit=crop",
+          images: shop.image ? [shop.image, shop.image, shop.image, shop.image] : ["https://images.unsplash.com/photo-1488459716781-6e3100ce3ce0?w=800&h=600&fit=crop"],
           pricing:
             shop.pricing?.length > 0
               ? shop.pricing
               : fallbackPricing[shop.category] || [{ title: "Basic Service", price: "₹100" }],
           minimumOrder: shop.minimumOrder || "₹0",
-          phone: shop.contact || "Not available",
-          address: shop.address || "Address not available",
+          phone: shop.phone || "Not available",
+          address: shop.location?.address || "Address not available",
           description:
             shop.description ||
             `${shop.name} is a trusted ${shop.category.toLowerCase()} service provider in your area.`,
@@ -136,17 +129,7 @@ function ServiceDetails() {
       </>
     );
 
-  // Generate proper map links
-  const getMapLink = () => {
-    if (!service.coordinates || service.coordinates.length < 2) {
-      // Fallback location (Delhi)
-      return "https://www.openstreetmap.org/?mlat=28.7041&mlon=77.1025&zoom=15";
-    }
-    const [lng, lat] = service.coordinates;
-    return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=16&marker=${lat},${lng}`;
-  };
-
-  const openStreetMapLink = getMapLink();
+  // Generate proper map link
   const googleMapsLink = service.coordinates && service.coordinates.length === 2
     ? `https://www.google.com/maps/?q=${service.coordinates[1]},${service.coordinates[0]}`
     : "https://www.google.com/maps";
@@ -241,14 +224,9 @@ function ServiceDetails() {
             </div>
           </div>
           <div className="map-cta">
-            <div className="map-buttons-container">
-              <a href={googleMapsLink} target="_blank" rel="noreferrer" className="btn map-btn-google">
-                <FaMapPin /> Google Maps
-              </a>
-              <a href={openStreetMapLink} target="_blank" rel="noreferrer" className="btn map-btn-osm">
-                <FaMapPin /> OpenStreetMap
-              </a>
-            </div>
+            <a href={googleMapsLink} target="_blank" rel="noreferrer" className="btn map-btn-google">
+              <FaMapPin /> Google Maps
+            </a>
           </div>
         </div>
 

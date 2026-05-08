@@ -12,13 +12,30 @@ function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [validating, setValidating] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    if (!token) {
-      setError("Invalid reset link. Please request a new one.");
-    }
+    const validateToken = async () => {
+      if (!token) {
+        setError("Invalid reset link. Please request a new one.");
+        setValidating(false);
+        return;
+      }
+
+      try {
+        setValidating(true);
+        await API.get(`/auth/validate-reset-token/${token}`);
+        setValidating(false);
+        setError("");
+      } catch (err) {
+        setValidating(false);
+        setError(err.response?.data?.message || "Invalid or expired reset link. Please request a new one.");
+      }
+    };
+
+    validateToken();
   }, [token]);
 
   const handleSubmit = async (e) => {
@@ -78,6 +95,33 @@ function ResetPassword() {
                 Redirecting to login in 3 seconds...
               </p>
             </div>
+          ) : validating ? (
+            <div style={{
+              background: "#f0f9ff", border: "1px solid #bfdbfe",
+              borderRadius: "8px", padding: "20px", textAlign: "center"
+            }}>
+              <p style={{ color: "#1e40af", margin: "0", fontWeight: "500" }}>
+                🔄 Validating reset link...
+              </p>
+            </div>
+          ) : error ? (
+            <div style={{
+              background: "#fef2f2", border: "1px solid #fecaca",
+              borderRadius: "8px", padding: "20px", textAlign: "center"
+            }}>
+              <p style={{ color: "#991b1b", margin: "0 0 12px 0", fontWeight: "500" }}>
+                ❌ {error}
+              </p>
+              <p style={{ color: "#64748b", fontSize: "13px", margin: "0 0 12px 0" }}>
+                The reset link has expired or is invalid.
+              </p>
+              <Link to="/login" style={{
+                display: "inline-block", color: "#2563eb", textDecoration: "none",
+                fontWeight: "500", fontSize: "14px"
+              }}>
+                Back to Login
+              </Link>
+            </div>
           ) : (
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: "16px" }}>
@@ -124,11 +168,12 @@ function ResetPassword() {
 
               <button
                 type="submit"
-                disabled={loading || !token}
+                disabled={loading || validating || !token || !!error}
                 style={{
                   width: "100%", padding: "12px", border: "none",
-                  borderRadius: "6px", background: "#2563eb", color: "white",
-                  cursor: "pointer", fontSize: "15px", fontWeight: "500"
+                  borderRadius: "6px", background: loading ? "#94a3b8" : "#2563eb", 
+                  color: "white", cursor: loading ? "not-allowed" : "pointer", 
+                  fontSize: "15px", fontWeight: "500"
                 }}
               >
                 {loading ? "Resetting..." : "Reset Password"}

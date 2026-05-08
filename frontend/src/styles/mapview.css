@@ -158,15 +158,6 @@
   box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
 }
 
-.view-map-btn.osm-btn {
-  background: linear-gradient(to right, #94a3b8, #64748b);
-}
-
-.view-map-btn.osm-btn:hover {
-  background: linear-gradient(to right, #78909c, #546e7a);
-  box-shadow: 0 8px 20px rgba(120, 144, 156, 0.4);
-}
-
 /* Services Section */
 .services-section {
   background: white;

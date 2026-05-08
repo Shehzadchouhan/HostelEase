@@ -13,14 +13,31 @@ router.use((req, res, next) => {
   next();
 });
 
-// Email transporter
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
+// Get the correct frontend URL (production or local)
+const getFrontendURL = () => {
+  // Priority: explicit FRONTEND_URL > FRONTEND_DOMAIN > localhost
+  if (process.env.FRONTEND_URL) {
+    return process.env.FRONTEND_URL;
   }
-});
+  if (process.env.FRONTEND_DOMAIN) {
+    return `https://${process.env.FRONTEND_DOMAIN}`;
+  }
+  // Default to production URL if available, else localhost
+  return process.env.NODE_ENV === 'production' 
+    ? 'https://hostel-ease-sigma.vercel.app'
+    : 'http://localhost:5173';
+};
+
+// Email transporter - Create it lazily to ensure env vars are loaded
+const getTransporter = () => {
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD
+    }
+  });
+};
 
 // @route   POST /api/auth/register
 router.post('/register', async (req, res) => {
@@ -119,8 +136,11 @@ router.post('/forgot-password', async (req, res) => {
     user.resetPasswordExpires = resetTokenExpiry;
     await user.save();
 
-    // Send email
-    const resetURL = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+    // Send email with proper frontend URL
+    const frontendURL = getFrontendURL();
+    const resetURL = `${frontendURL}/reset-password?token=${resetToken}`;
+    
+    console.log('Password reset link:', resetURL);
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -145,7 +165,7 @@ router.post('/forgot-password', async (req, res) => {
       `
     };
 
-    await transporter.sendMail(mailOptions);
+    await getTransporter().sendMail(mailOptions);
 
     res.json({ success: true, message: 'Password reset link sent to your email' });
   } catch (error) {
@@ -187,6 +207,32 @@ router.post('/reset-password', async (req, res) => {
   } catch (error) {
     console.error('Reset password error:', error);
     res.status(500).json({ success: false, message: 'Error resetting password' });
+  }
+});
+
+// @route   GET /api/auth/validate-reset-token/:token
+// @desc    Validate if reset token is valid and not expired
+router.get('/validate-reset-token/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    if (!token) {
+      return res.status(400).json({ success: false, message: 'Token is required' });
+    }
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired reset token' });
+    }
+
+    res.json({ success: true, message: 'Token is valid' });
+  } catch (error) {
+    console.error('Validate reset token error:', error);
+    res.status(500).json({ success: false, message: 'Error validating token' });
   }
 });
 

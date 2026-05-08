@@ -413,8 +413,7 @@ body {
     gap: 10px;
   }
 
-  .map-btn-google,
-  .map-btn-osm {
+  .map-btn-google {
     width: 100%;
     padding: 12px 14px;
     font-size: 13px;
@@ -551,10 +550,8 @@ body {
   margin-top: 10px;
 }
 
-.map-buttons-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+.map-cta {
+  margin-top: 10px;
 }
 
 .map-btn-google {
@@ -572,35 +569,13 @@ body {
   gap: 8px;
   transition: all 0.3s ease;
   text-decoration: none;
+  width: 100%;
 }
 
 .map-btn-google:hover {
   background: #c5221f;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(234, 67, 53, 0.4);
-}
-
-.map-btn-osm {
-  background: #0b7285;
-  color: white;
-  padding: 12px 16px;
-  border: none;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 13px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  text-decoration: none;
-}
-
-.map-btn-osm:hover {
-  background: #094346;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(11, 114, 133, 0.4);
 }
 
 /* DESCRIPTION SECTION */
@@ -932,13 +907,7 @@ body {
     font-size: 12px;
   }
 
-  .map-buttons-container {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  .map-btn-google,
-  .map-btn-osm {
+  .map-btn-google {
     width: 100%;
     padding: 11px 12px;
     font-size: 12px;
